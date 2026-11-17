@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zono | Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #050507;
+            --bg-panel: rgba(15, 15, 19, 0.85);
+            --text-main: #ffffff;
+            --text-muted: #8b8b93;
+            --primary: #ccff00; 
+            --primary-hover: #b3e600;
+            --primary-glow: rgba(204, 255, 0, 0.4);
+            --accent-red: #ff3366;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(105deg, rgba(5,5,7,0.95) 40%, rgba(5,5,7,0.8) 100%),
+                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+        }
+
+        .cyber-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: 0; pointer-events: none;
+            mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+        }
+
+        .orb { position: absolute; border-radius: 50%; filter: blur(150px); z-index: 0; opacity: 0.15; pointer-events: none; }
+        .orb-1 { top: 10%; left: 10%; width: 400px; height: 400px; background: var(--primary); }
+        .orb-2 { bottom: 10%; right: 10%; width: 300px; height: 300px; background: var(--accent-red); }
+
+        .auth-container {
+            position: relative; z-index: 1; background: var(--bg-panel);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.05); padding: 50px 40px;
+            width: 100%; max-width: 440px; border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); animation: scaleIn 0.5s ease forwards;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+        }
+
+        .auth-container:hover { border-color: rgba(204, 255, 0, 0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 30px rgba(204, 255, 0, 0.05); }
+        @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.95) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .logo { font-family: var(--font-heading); font-size: 2.2rem; font-weight: 900; text-align: center; margin-bottom: 35px; display: flex; justify-content: center; align-items: center; gap: 12px; letter-spacing: 2px; }
+        .logo i { color: var(--primary); filter: drop-shadow(0 0 10px var(--primary-glow)); }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i.icon-left { position: absolute; left: 16px; color: var(--text-muted); transition: color 0.3s ease; }
+        .input-wrapper input { width: 100%; padding: 15px 15px 15px 48px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: white; font-family: var(--font-body); font-size: 1.05rem; font-weight: 500; border-radius: 8px; outline: none; transition: var(--transition); }
+        .input-wrapper input:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); box-shadow: 0 0 15px rgba(204, 255, 0, 0.1); }
+        .input-wrapper input:focus + i.icon-left { color: var(--primary); }
+        
+        .toggle-password { position: absolute; right: 16px; cursor: pointer; color: var(--text-muted); transition: color 0.3s ease; font-size: 1.1rem; z-index: 5; }
+        .toggle-password:hover { color: var(--primary); }
+
+        .btn-full { width: 100%; padding: 16px; font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; text-transform: uppercase; cursor: pointer; border: none; transition: var(--transition); border-radius: 8px; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary-glow); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 0 30px var(--primary-glow); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        
+        .spinner { display: none; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .divider span { padding: 0 15px; }
+
+        .btn-google { width: 100%; padding: 14px; background: transparent; color: #fff; font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 12px; transition: var(--transition); }
+        .btn-google:hover { background: rgba(255,255,255,0.05); border-color: #fff; transform: translateY(-2px); }
+        .btn-google img { width: 22px; height: 22px; }
+
+        .error-msg { color: var(--accent-red); font-size: 0.9rem; text-align: center; margin-top: 15px; display: none; background: rgba(255, 51, 102, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 51, 102, 0.2); }
+        
+        .auth-footer { text-align: center; margin-top: 25px; color: var(--text-muted); font-size: 0.95rem; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; transition: var(--transition); }
+        .auth-footer a:hover { text-shadow: 0 0 10px var(--primary-glow); }
+        .back-home { display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem; text-decoration: none; transition: var(--transition); }
+        .back-home:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="auth-container">
+        <div class="logo"><i class="fa-solid fa-gamepad"></i> ZONO</div>
+
+        <form id="login-form">
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope icon-left"></i>
+                    <input type="email" id="login-email" placeholder="player@zono.com" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock icon-left"></i>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                    <i class="fa-solid fa-eye toggle-password" data-target="login-password"></i>
+                </div>
+            </div>
+            <button type="submit" class="btn-full btn-primary" id="btn-login">
+                <span class="btn-text">Enter Arena</span>
+                <i class="fa-solid fa-circle-notch spinner"></i>
+            </button>
+            <div class="error-msg" id="login-error"></div>
+        </form>
+
+        <div class="divider"><span>OR</span></div>
+
+        <button class="btn-google" id="google-login">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+            Continue with Google
+        </button>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="signup.html">Create one</a>
+        </div>
+        <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCbplkXSNKD624BIfE5jzVyiSXXKuNhh8",
+            authDomain: "zonoco.firebaseapp.com",
+            projectId: "zonoco",
+            storageBucket: "zonoco.firebasestorage.app",
+            messagingSenderId: "157338128433",
+            appId: "1:157338128433:web:52e35cf7483d5d65cec510",
+            measurementId: "G-GCH7HHM66Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        document.querySelectorAll('.toggle-password').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const input = document.getElementById(this.getAttribute('data-target'));
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        });
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('btn-login');
+            const text = btn.querySelector('.btn-text');
+            const spinner = btn.querySelector('.spinner');
+            if (isLoading) {
+                btn.disabled = true; text.style.display = 'none'; spinner.style.display = 'block';
+            } else {
+                btn.disabled = false; text.style.display = 'block'; spinner.style.display = 'none';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('login-error');
+            el.textContent = msg; el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            document.getElementById('login-error').style.display = 'none';
+            setLoading(true);
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { window.location.href = "dashboard.html"; })
+                .catch((error) => {
+                    setLoading(false);
+                    let msg = "Login failed.";
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') msg = "Invalid email or password.";
+                    else if (error.code === 'auth/too-many-requests') msg = "Too many attempts. Try again later.";
+                    showError(msg);
+                });
+        });
+
+        document.getElementById('google-login').addEventListener('click', () => {
+            const btn = document.getElementById('google-login');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch spinner" style="display:block; margin: 0 auto;"></i>';
+            btn.disabled = true;
+
+            signInWithPopup(auth, googleProvider)
+                .then(() => { window.location.href = "dashboard.html"; })
+                .catch((error) => {
+                    btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continue with Google';
+                    btn.disabled = false;
+                    showError(error.message);
+                });
+        });
+    </script>
+</body>
+</html>

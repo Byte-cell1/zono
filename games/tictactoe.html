@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zono | Tic-Tac-Toe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --bg-dark: #050507;
+            --bg-panel: #111117;
+            --text-main: #f5f7ff;
+            --text-muted: #a4a9b8;
+            --primary: #ccff00;
+            --primary-glow: rgba(204, 255, 0, 0.38);
+            --accent-red: #ff3366;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+            --shadow-soft: 0 0 24px rgba(204, 255, 0, 0.18);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(204, 255, 0, 0.08), transparent 28%),
+                radial-gradient(circle at 85% 70%, rgba(255, 51, 102, 0.08), transparent 30%),
+                var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            padding: 20px 16px 32px;
+        }
+
+        header {
+            width: min(1100px, 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .title {
+            font-family: var(--font-heading);
+            letter-spacing: 2px;
+            color: var(--primary);
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            text-transform: uppercase;
+            text-shadow: 0 0 16px var(--primary-glow);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover, .back-link:focus-visible { color: var(--primary); outline: none; }
+
+        .game-shell {
+            width: min(1100px, 100%);
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            gap: 28px;
+            align-items: start;
+            padding-top: 28px;
+        }
+
+        .board-panel, .side-panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+        .board-panel { padding: 18px 18px 12px; }
+        .side-panel { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* Difficulty selector */
+        .difficulty-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .diff-btn {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .diff-btn:hover { color: var(--text-main); border-color: rgba(255,255,255,0.25); }
+        .diff-btn.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .diff-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .score-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .score-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 12px 12px 10px;
+            text-align: center;
+        }
+        .score-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .score-value {
+            font-family: var(--font-heading);
+            font-size: clamp(1.3rem, 3vw, 2rem);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .players {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 10px 14px;
+            min-width: 150px;
+            transition: all 0.25s ease;
+        }
+        .player.active {
+            border-color: var(--primary);
+            background: rgba(204,255,0,0.07);
+            box-shadow: 0 0 22px var(--primary-glow);
+        }
+        .player-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .player-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .avatar-initial {
+            width: 100%; height: 100%;
+            display: grid; place-items: center;
+            font-family: var(--font-heading);
+            background: var(--primary);
+            color: #000;
+            font-weight: 900;
+        }
+        .player-name {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
+        }
+        .player-symbol {
+            margin-left: auto;
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            width: min(100%, 420px);
+            margin: 0 auto;
+        }
+        .cell {
+            aspect-ratio: 1;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.03);
+            display: grid;
+            place-items: center;
+            font-family: var(--font-heading);
+            font-size: clamp(2.4rem, 7vw, 4rem);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+        .cell:hover:not(.filled) {
+            background: rgba(204,255,0,0.04);
+            border-color: rgba(204,255,0,0.5);
+            transform: translateY(-1px);
+        }
+        .cell.filled { cursor: default; }
+        .cell.x { color: var(--primary); text-shadow: 0 0 18px var(--primary-glow); }
+        .cell.o { color: var(--accent-blue); text-shadow: 0 0 18px rgba(0, 212, 255, 0.4); }
+        .cell.win {
+            background: rgba(0,255,136,0.12);
+            border-color: rgba(0,255,136,0.8);
+            box-shadow: 0 0 18px rgba(0,255,136,0.5);
+            animation: pulseWin 0.9s ease-in-out infinite alternate;
+        }
+        @keyframes pulseWin {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
+        .status {
+            min-height: 40px;
+            display: grid;
+            place-items: center;
+            margin: 16px 0 8px;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .status.your-turn { color: var(--primary); text-shadow: 0 0 16px var(--primary-glow); }
+        .status.win { color: var(--accent-green); }
+        .status.lose { color: var(--accent-red); }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .btn {
+            appearance: none;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: #000;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            box-shadow: 0 12px 26px rgba(204, 255, 0, 0.18);
+        }
+        .btn:hover, .btn:focus-visible {
+            transform: translateY(-2px);
+            background: #b9ec1a;
+            outline: none;
+        }
+        .btn.secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: none;
+        }
+        .btn.secondary:hover, .btn.secondary:focus-visible { background: rgba(255,255,255,0.08); }
+
+        .side-panel h2 {
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+        .stat-list { display: grid; gap: 10px; }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .stat-item span:first-child {
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+        .stat-item strong {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        /* In-game chat */
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 14px;
+        }
+        .chat-messages {
+            height: 180px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 5px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .chat-msg {
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        .chat-msg.me { background: var(--primary); color: #000; align-self: flex-end; }
+        .chat-msg.them { background: rgba(255,255,255,0.08); color: var(--text-main); align-self: flex-start; }
+        .chat-msg.system {
+            background: transparent;
+            color: var(--text-muted);
+            align-self: center;
+            font-style: italic;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 16px;
+            outline: none;
+        }
+        .chat-input-row input:focus { border-color: var(--primary); }
+        .chat-input-row button {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            width: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .result-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5,5,7,0.74);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .result-modal.show { display: flex; }
+        .modal-card {
+            width: min(430px, 100%);
+            background: var(--bg-panel);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 22px;
+            padding: 24px 20px 18px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+            text-align: center;
+        }
+        .modal-card h3 {
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .modal-card p { color: var(--text-muted); font-size: 1rem; margin-bottom: 18px; }
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 900px) {
+            .game-shell { grid-template-columns: 1fr; max-width: 520px; }
+        }
+        @media (max-width: 520px) {
+            .players { flex-direction: column; }
+            .player { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../dashboard.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="title">Tic-Tac-Toe</div>
+        <div style="width: 60px;"></div>
+    </header>
+
+    <div class="game-shell">
+        <div class="board-panel">
+            <!-- Difficulty selector (solo only) -->
+            <div class="difficulty-row" id="difficulty-row">
+                <button class="diff-btn" data-diff="easy" type="button">Easy</button>
+                <button class="diff-btn" data-diff="medium" type="button">Medium</button>
+                <button class="diff-btn active" data-diff="hard" type="button">Hard</button>
+            </div>
+
+            <div class="score-row">
+                <div class="score-box"><span class="score-label">You</span><div class="score-value" id="score-me">0</div></div>
+                <div class="score-box"><span class="score-label">Draws</span><div class="score-value" id="score-draws">0</div></div>
+                <div class="score-box"><span class="score-label">Rival</span><div class="score-value" id="score-rival">0</div></div>
+            </div>
+
+            <div class="players">
+                <div class="player" id="player-x">
+                    <div class="player-avatar"></div>
+                    <div class="player-name">Player X</div>
+                    <div class="player-symbol">X</div>
+                </div>
+                <div class="player" id="player-o">
+                    <div class="player-avatar"></div>
+                    <div class="player-name">Player O</div>
+                    <div class="player-symbol">O</div>
+                </div>
+            </div>
+
+            <div class="board" id="board"></div>
+            <div class="status" id="status">Loading...</div>
+
+            <div class="controls">
+                <button class="btn" id="rematch-btn" type="button">Rematch</button>
+                <button class="btn secondary" id="reset-score-btn" type="button">Reset Score</button>
+                <a href="../dashboard.html" class="btn secondary" id="return-btn" style="text-decoration:none; display:none;">Dashboard</a>
+            </div>
+        </div>
+
+        <aside class="side-panel">
+            <h2>Match Info</h2>
+            <div class="stat-list">
+                <div class="stat-item"><span>Round</span><strong id="round-count">1</strong></div>
+                <div class="stat-item"><span>Mode</span><strong id="match-mode">Live</strong></div>
+                <div class="stat-item"><span>Turn</span><strong id="turn-indicator">X</strong></div>
+            </div>
+
+            <div class="chat-section">
+                <h2>Chat</h2>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-msg system">Chat is active during the match</div>
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" id="chat-input" placeholder="Say something..." maxlength="300">
+                    <button id="chat-send" type="button"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="result-modal" id="result-modal" aria-hidden="true">
+        <div class="modal-card">
+            <h3 id="modal-title">You Win!</h3>
+            <p id="modal-message">Nice move. Want another round?</p>
+            <div class="modal-actions">
+                <button class="btn" id="modal-rematch" type="button">Play Again</button>
+                <button class="btn secondary" id="modal-close" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, updateDoc, onSnapshot,
+            addDoc, collection, increment, serverTimestamp, orderBy, limit, query
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCbplkXSNKD624BIfE5jzVyiSXXKuNhh8",
+            authDomain: "zonoco.firebaseapp.com",
+            projectId: "zonoco",
+            storageBucket: "zonoco.firebasestorage.app",
+            messagingSenderId: "157338128433",
+            appId: "1:157338128433:web:52e35cf7483d5d65cec510",
+            measurementId: "G-GCH7HHM66Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const params = new URLSearchParams(window.location.search);
+        let matchId = params.get('match');
+        let requestedDifficulty = params.get('diff') || 'hard';
+
+        const boardEl = document.getElementById('board');
+        const statusEl = document.getElementById('status');
+        const modal = document.getElementById('result-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const roundCountEl = document.getElementById('round-count');
+        const turnIndicatorEl = document.getElementById('turn-indicator');
+        const matchModeEl = document.getElementById('match-mode');
+        const meScoreEl = document.getElementById('score-me');
+        const drawsScoreEl = document.getElementById('score-draws');
+        const rivalScoreEl = document.getElementById('score-rival');
+        const difficultyRow = document.getElementById('difficulty-row');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        let currentUser = null;
+        let matchData = null;
+        let players = {};
+        let mySymbol = null;
+        let myUid = null;
+        let roundNumber = 1;
+        let localScores = { me: 0, rival: 0, draws: 0 };
+        let lastHandledResult = null;
+        let resultSaved = false;
+        let matchUnsub = null;
+        let chatUnsub = null;
+        let botTimer = null;
+        let currentDifficulty = requestedDifficulty;
+
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.index = i;
+            cell.addEventListener('click', () => makeMove(i));
+            boardEl.appendChild(cell);
+        }
+
+        document.getElementById('rematch-btn').addEventListener('click', resetBoard);
+        document.getElementById('modal-rematch').addEventListener('click', resetBoard);
+        document.getElementById('modal-close').addEventListener('click', hideResultModal);
+        document.getElementById('reset-score-btn').addEventListener('click', resetScoreboard);
+
+        // Difficulty picker
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.diff === currentDifficulty);
+            btn.addEventListener('click', () => {
+                if (matchData && !matchData.players[1]?.startsWith('SOLO_')) return;
+                currentDifficulty = btn.dataset.diff;
+                document.querySelectorAll('.diff-btn').forEach(b => b.classList.toggle('active', b === btn));
+                resetBoard();
+            });
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = '../login.html'; return; }
+            currentUser = user;
+            myUid = user.uid;
+
+            // Create solo match if no matchId
+            if (!matchId) {
+                try {
+                    const newMatchRef = await addDoc(collection(db, 'matches'), {
+                        gameId: 'tictactoe',
+                        players: [myUid, 'SOLO_' + myUid.slice(0, 6)],
+                        difficulty: currentDifficulty,
+                        status: 'playing',
+                        state: { board: Array(9).fill(null), turn: 'X', result: null },
+                        ready: [],
+                        createdAt: serverTimestamp()
+                    });
+                    matchId = newMatchRef.id;
+                    const newUrl = window.location.pathname + '?match=' + matchId + '&diff=' + currentDifficulty;
+                    window.history.replaceState({}, '', newUrl);
+                } catch (err) {
+                    console.error('Failed to create solo match:', err);
+                    statusEl.textContent = 'Could not start match';
+                    return;
+                }
+            }
+
+            const matchRef = doc(db, 'matches', matchId);
+            const initial = await getDoc(matchRef);
+            if (!initial.exists()) { statusEl.textContent = 'Match not found'; return; }
+            matchData = initial.data();
+
+            if (!matchData.players || matchData.players.length < 2) {
+                await updateDoc(matchRef, { players: [myUid, 'SOLO_' + myUid.slice(0, 6)] });
+                matchData = (await getDoc(matchRef)).data();
+            }
+
+            const [p1, p2] = matchData.players;
+            mySymbol = myUid === p1 ? 'X' : 'O';
+            const isSolo = p2.startsWith('SOLO_');
+            matchModeEl.textContent = isSolo ? 'Practice' : 'Live';
+
+            // Load profiles
+            try {
+                const s1 = p1.startsWith('SOLO_') ? null : await getDoc(doc(db, 'users', p1));
+                const s2 = p2.startsWith('SOLO_') ? null : await getDoc(doc(db, 'users', p2));
+                players[p1] = s1?.exists() ? s1.data() : { displayName: p1.startsWith('SOLO_') ? 'Practice Bot' : 'Player 1', photoURL: '' };
+                players[p2] = s2?.exists() ? s2.data() : { displayName: p2.startsWith('SOLO_') ? 'Practice Bot' : 'Player 2', photoURL: '' };
+            } catch (err) { console.error(err); }
+
+            renderPlayers();
+
+            if (!matchData.state || !matchData.state.board) {
+                await updateDoc(matchRef, {
+                    state: { board: Array(9).fill(null), turn: 'X', result: null },
+                    status: 'playing'
+                });
+            }
+
+            // Difficulty row visible only in solo
+            if (!isSolo) difficultyRow.style.display = 'none';
+
+            // Live match listener
+            if (matchUnsub) matchUnsub();
+            matchUnsub = onSnapshot(matchRef, (snap) => {
+                if (!snap.exists()) return;
+                matchData = snap.data();
+                renderBoard();
+
+                if (matchData.players[1]?.startsWith('SOLO_')
+                    && matchData.state?.turn === 'O'
+                    && !matchData.state?.result) {
+                    clearTimeout(botTimer);
+                    botTimer = setTimeout(() => botMove(), 500);
+                }
+            });
+
+            // Chat listener
+            startChat();
+        });
+
+        // ---------- Chat ----------
+        function chatRoomId(a, b) { return [a, b].sort().join('_'); }
+
+        function startChat() {
+            if (!matchData?.players) return;
+            const [p1, p2] = matchData.players;
+            const isSolo = p2.startsWith('SOLO_');
+
+            if (isSolo) {
+                chatMessages.innerHTML = '<div class="chat-msg system">Practice mode — chat is disabled. Invite a friend for live chat.</div>';
+                document.getElementById('chat-send').disabled = true;
+                chatInput.disabled = true;
+                return;
+            }
+
+            const roomId = 'match_' + matchId;
+            const q = query(
+                collection(db, 'chats', roomId, 'messages'),
+                orderBy('createdAt', 'asc'),
+                limit(100)
+            );
+
+            if (chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(q, (snap) => {
+                chatMessages.innerHTML = '';
+                if (snap.empty) {
+                    chatMessages.innerHTML = '<div class="chat-msg system">Say hi to your opponent</div>';
+                }
+                snap.forEach(mDoc => {
+                    const m = mDoc.data();
+                    const mine = m.senderId === currentUser.uid;
+                    const div = document.createElement('div');
+                    div.className = 'chat-msg ' + (mine ? 'me' : 'them');
+                    div.textContent = m.text;
+                    chatMessages.appendChild(div);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+
+        async function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            chatInput.value = '';
+            const roomId = 'match_' + matchId;
+            try {
+                await addDoc(collection(db, 'chats', roomId, 'messages'), {
+                    senderId: myUid,
+                    text,
+                    createdAt: serverTimestamp()
+                });
+                await doc(db, 'chats', roomId);
+            } catch (err) { console.error('Chat send failed:', err); }
+        }
+
+        document.getElementById('chat-send').addEventListener('click', sendChat);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+
+        // ---------- Rendering ----------
+        function renderPlayers() {
+            if (!matchData?.players) return;
+            const [p1, p2] = matchData.players;
+            renderPlayerBox('player-x', players[p1]);
+            renderPlayerBox('player-o', players[p2]);
+        }
+
+        function renderPlayerBox(id, data) {
+            const el = document.getElementById(id);
+            if (!el || !data) return;
+            const name = data.displayName || data.email || 'Player';
+            const avatar = data.photoURL
+                ? `<img src="${data.photoURL}" alt="${name}">`
+                : `<div class="avatar-initial">${name.charAt(0).toUpperCase()}</div>`;
+            el.querySelector('.player-avatar').innerHTML = avatar;
+            el.querySelector('.player-name').textContent = name;
+        }
+
+        function updateScoreDisplay() {
+            meScoreEl.textContent = localScores.me;
+            rivalScoreEl.textContent = localScores.rival;
+            drawsScoreEl.textContent = localScores.draws;
+            roundCountEl.textContent = roundNumber;
+        }
+
+        function resetScoreboard() {
+            localScores = { me: 0, rival: 0, draws: 0 };
+            roundNumber = 1;
+            updateScoreDisplay();
+            hideResultModal();
+        }
+
+        async function resetBoard() {
+            if (!matchData || !matchId) return;
+            clearTimeout(botTimer);
+            roundNumber += 1;
+            lastHandledResult = null;
+            resultSaved = false;
+            document.getElementById('return-btn').style.display = 'none';
+            const updates = {
+                'state.board': Array(9).fill(null),
+                'state.turn': 'X',
+                'state.result': null,
+                status: 'playing'
+            };
+            if (matchData.players[1]?.startsWith('SOLO_')) {
+                updates.difficulty = currentDifficulty;
+            }
+            await updateDoc(doc(db, 'matches', matchId), updates);
+            hideResultModal();
+            updateScoreDisplay();
+        }
+
+        function applyLocalScore(result) {
+            if (!result) return;
+            const fp = JSON.stringify(result);
+            if (fp === JSON.stringify(lastHandledResult)) return;
+            lastHandledResult = result;
+
+            if (result.winner === 'draw') localScores.draws++;
+            else if (result.winner === mySymbol) localScores.me++;
+            else localScores.rival++;
+            updateScoreDisplay();
+        }
+
+        function showResultModal(type, text) {
+            modalTitle.textContent = type === 'win' ? 'You Win!' : (type === 'draw' ? 'Draw Game' : 'You Lost');
+            modalMessage.textContent = text;
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+        function hideResultModal() {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        function renderBoard() {
+            if (!matchData?.state?.board) return;
+            const board = matchData.state.board;
+            const turn = matchData.state.turn;
+            const result = matchData.state.result;
+
+            if (!result) resultSaved = false;
+
+            board.forEach((value, index) => {
+                const cell = boardEl.children[index];
+                cell.className = 'cell';
+                cell.textContent = '';
+                if (value) {
+                    cell.classList.add('filled', value.toLowerCase());
+                    cell.textContent = value;
+                }
+            });
+
+            if (result?.line) {
+                result.line.forEach(i => boardEl.children[i].classList.add('win'));
+            }
+
+            document.getElementById('player-x').classList.toggle('active', turn === 'X' && !result);
+            document.getElementById('player-o').classList.toggle('active', turn === 'O' && !result);
+            turnIndicatorEl.textContent = turn || 'X';
+
+            if (result) {
+                if (!resultSaved) { saveResult(result); resultSaved = true; }
+                applyLocalScore(result);
+
+                if (result.winner === 'draw') {
+                    statusEl.textContent = 'Draw Game';
+                    statusEl.className = 'status';
+                    showResultModal('draw', 'Nobody could get a full line — rematch and try again.');
+                } else if (result.winner === mySymbol) {
+                    statusEl.textContent = 'You Won!';
+                    statusEl.className = 'status win';
+                    showResultModal('win', 'Great win. Your strategy landed the final line.');
+                } else {
+                    statusEl.textContent = 'You Lost';
+                    statusEl.className = 'status lose';
+                    showResultModal('lose', 'That round slipped away. Reset and go again.');
+                }
+                document.getElementById('return-btn').style.display = 'inline-block';
+            } else if (turn === mySymbol) {
+                statusEl.textContent = 'Your Turn';
+                statusEl.className = 'status your-turn';
+                hideResultModal();
+            } else {
+                statusEl.textContent = "Opponent's Turn";
+                statusEl.className = 'status';
+                hideResultModal();
+            }
+            updateScoreDisplay();
+        }
+
+        async function makeMove(index) {
+            if (!matchData?.state || matchData.state.result) return;
+            if (matchData.state.turn !== mySymbol) return;
+            if (matchData.state.board[index]) return;
+
+            const newBoard = [...matchData.state.board];
+            newBoard[index] = mySymbol;
+            const nextTurn = mySymbol === 'X' ? 'O' : 'X';
+            const result = checkResult(newBoard);
+
+            await updateDoc(doc(db, 'matches', matchId), {
+                'state.board': newBoard,
+                'state.turn': nextTurn,
+                'state.result': result || null,
+                status: result ? 'finished' : 'playing'
+            });
+        }
+
+        // ---------- BOT with difficulty ----------
+        async function botMove() {
+            if (!matchData?.state || matchData.state.result) return;
+            if (matchData.state.turn !== 'O') return;
+
+            const board = matchData.state.board;
+            const diff = matchData.difficulty || 'hard';
+            let pick;
+
+            if (diff === 'easy') {
+                const open = board.map((v, i) => v ? null : i).filter(v => v !== null);
+                pick = open[Math.floor(Math.random() * open.length)];
+            } else if (diff === 'medium') {
+                pick = bestMoveMedium(board);
+            } else {
+                pick = bestMoveHard(board);
+            }
+
+            if (pick === undefined || pick === null) return;
+
+            const newBoard = [...board];
+            newBoard[pick] = 'O';
+            const result = checkResult(newBoard);
+
+            await updateDoc(doc(db, 'matches', matchId), {
+                'state.board': newBoard,
+                'state.turn': 'X',
+                'state.result': result || null,
+                status: result ? 'finished' : 'playing'
+            });
+        }
+
+        // Medium: win if possible, block if needed, else random
+        function bestMoveMedium(board) {
+            // Try to win
+            for (let i = 0; i < 9; i++) {
+                if (!board[i]) {
+                    const copy = [...board];
+                    copy[i] = 'O';
+                    const r = checkResult(copy);
+                    if (r && r.winner === 'O') return i;
+                }
+            }
+            // Try to block
+            for (let i = 0; i < 9; i++) {
+                if (!board[i]) {
+                    const copy = [...board];
+                    copy[i] = 'X';
+                    const r = checkResult(copy);
+                    if (r && r.winner === 'X') return i;
+                }
+            }
+            // Random
+            const open = board.map((v, i) => v ? null : i).filter(v => v !== null);
+            return open[Math.floor(Math.random() * open.length)];
+        }
+
+        // Hard: minimax (unbeatable)
+        function bestMoveHard(board) {
+            let bestScore = -Infinity;
+            let bestMove = null;
+            for (let i = 0; i < 9; i++) {
+                if (!board[i]) {
+                    board[i] = 'O';
+                    const score = minimax(board, 0, false);
+                    board[i] = null;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+            return bestMove;
+        }
+
+        function minimax(board, depth, isMaximizing) {
+            const r = checkResult(board);
+            if (r) {
+                if (r.winner === 'O') return 10 - depth;
+                if (r.winner === 'X') return depth - 10;
+                return 0;
+            }
+            if (isMaximizing) {
+                let best = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (!board[i]) {
+                        board[i] = 'O';
+                        best = Math.max(best, minimax(board, depth + 1, false));
+                        board[i] = null;
+                    }
+                }
+                return best;
+            } else {
+                let best = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (!board[i]) {
+                        board[i] = 'X';
+                        best = Math.min(best, minimax(board, depth + 1, true));
+                        board[i] = null;
+                    }
+                }
+                return best;
+            }
+        }
+
+        function checkResult(board) {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (const line of lines) {
+                const [a, b, c] = line;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return { winner: board[a], line };
+                }
+            }
+            if (board.every(Boolean)) return { winner: 'draw' };
+            return null;
+        }
+
+        // ---------- Result saving ----------
+        async function saveResult(result) {
+            if (!matchData?.players) return;
+            const [p1, p2] = matchData.players;
+            const isDraw = result.winner === 'draw';
+            const winnerUid = isDraw ? null : (result.winner === 'X' ? p1 : p2);
+
+            for (const uid of [p1, p2]) {
+                if (!uid || uid.startsWith('SOLO_')) continue;
+                const ref = doc(db, 'users', uid);
+                const updates = { gamesPlayed: increment(1) };
+                if (isDraw) {
+                    updates.draws = increment(1);
+                    updates.xp = increment(10);
+                } else if (uid === winnerUid) {
+                    updates.wins = increment(1);
+                    updates.xp = increment(25);
+                } else {
+                    updates.losses = increment(1);
+                    updates.xp = increment(5);
+                }
+                await updateDoc(ref, updates);
+            }
+
+            for (const uid of [p1, p2]) {
+                if (!uid || uid.startsWith('SOLO_')) continue;
+                const outcome = isDraw ? 'draw' : (uid === winnerUid ? 'win' : 'loss');
+                await addDoc(collection(db, 'gameResults'), {
+                    uid, gameId: 'tictactoe', matchId,
+                    opponent: uid === p1 ? p2 : p1,
+                    outcome,
+                    score: isDraw ? 0 : (outcome === 'win' ? 1 : 0),
+                    mode: p2.startsWith('SOLO_') ? 'solo' : 'multiplayer',
+                    createdAt: serverTimestamp()
+                });
+            }
+
+            await updateDoc(doc(db, 'matches', matchId), { status: 'finished' });
+        }
+
+        updateScoreDisplay();
+    </script>
+</body>
+</html>

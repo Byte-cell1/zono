@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match | Zono</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg: #050507; --card: #131318; --muted: #8b8b93; --lime: #ccff00; --pink: #ff3366; }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; color: #fff; background: radial-gradient(circle at 20% 20%, rgba(204,255,0,.07), transparent 35%), var(--bg); font-family: 'Rajdhani', sans-serif; }
+        header { width: min(620px, 100%); display: flex; justify-content: space-between; align-items: center; padding: 8px 0 22px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        a { color: var(--muted); text-decoration: none; font-weight: 700; } a:hover { color: var(--lime); }
+        h1 { margin: 0; color: var(--lime); font: 700 clamp(1rem, 4vw, 1.5rem) 'Orbitron', sans-serif; letter-spacing: 1px; }
+        main { width: min(540px, 100%); text-align: center; }
+        .intro { color: var(--muted); margin: 18px 0; }
+        .scorebar { display: flex; justify-content: center; gap: 14px; margin-bottom: 16px; }
+        .score { min-width: 115px; padding: 10px 18px; border: 1px solid rgba(255,255,255,.08); background: var(--card); border-radius: 10px; }
+        .score span { display: block; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .score strong { color: var(--lime); font: 700 1.3rem 'Orbitron', sans-serif; }
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .tile { aspect-ratio: 1; border: 1px solid rgba(204,255,0,.2); border-radius: 12px; color: #fff; background: #17171e; font-size: clamp(1.5rem, 8vw, 2.6rem); cursor: pointer; transition: transform .18s, background .18s; }
+        .tile:hover:not(:disabled) { transform: translateY(-2px); background: #202027; }
+        .tile.revealed { background: rgba(204,255,0,.12); border-color: var(--lime); }
+        .tile.matched { color: var(--lime); border-color: rgba(204,255,0,.35); background: rgba(204,255,0,.06); cursor: default; }
+        .tile:disabled { cursor: default; }
+        .message { min-height: 28px; color: var(--lime); font-weight: 700; margin: 14px 0 8px; }
+        .restart { border: 0; border-radius: 8px; padding: 12px 22px; color: #000; background: var(--lime); font: 700 1rem 'Orbitron', sans-serif; cursor: pointer; }
+        .restart:hover { background: #b3e600; }
+        @media (max-width: 420px) { body { padding: 14px; } .board { gap: 7px; } .tile { border-radius: 9px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../dashboard.html"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <h1>MEMORY MATCH</h1>
+    </header>
+    <main>
+        <p class="intro">Find all eight matching pairs in as few moves as you can.</p>
+        <div class="scorebar" aria-live="polite">
+            <div class="score"><span>Moves</span><strong id="moves">0</strong></div>
+            <div class="score"><span>Pairs</span><strong id="pairs">0 / 8</strong></div>
+        </div>
+        <div class="board" id="board" aria-label="Memory card board"></div>
+        <p class="message" id="message" aria-live="polite"></p>
+        <button class="restart" id="restart" type="button">New Game</button>
+    </main>
+    <script>
+        const symbols = ['🎮', '👾', '🚀', '💎', '⚡', '🛸', '🎲', '🏆'];
+        const board = document.getElementById('board');
+        const movesEl = document.getElementById('moves');
+        const pairsEl = document.getElementById('pairs');
+        const messageEl = document.getElementById('message');
+        let openCards = [];
+        let matched = 0;
+        let moves = 0;
+        let locked = false;
+
+        function startGame() {
+            board.replaceChildren();
+            openCards = [];
+            matched = 0;
+            moves = 0;
+            locked = false;
+            movesEl.textContent = '0';
+            pairsEl.textContent = '0 / 8';
+            messageEl.textContent = '';
+            const deck = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            deck.forEach((symbol, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'tile';
+                button.textContent = '?';
+                button.setAttribute('aria-label', `Hidden card ${index + 1}`);
+                button.addEventListener('click', () => reveal(button, symbol));
+                board.appendChild(button);
+            });
+        }
+
+        function reveal(card, symbol) {
+            if (locked || card.disabled || card.classList.contains('revealed')) return;
+            card.textContent = symbol;
+            card.classList.add('revealed');
+            card.setAttribute('aria-label', symbol);
+            openCards.push({ card, symbol });
+            if (openCards.length < 2) return;
+
+            moves += 1;
+            movesEl.textContent = String(moves);
+            const [first, second] = openCards;
+            if (first.symbol === second.symbol) {
+                first.card.classList.add('matched');
+                second.card.classList.add('matched');
+                first.card.disabled = true;
+                second.card.disabled = true;
+                matched += 1;
+                pairsEl.textContent = `${matched} / 8`;
+                openCards = [];
+                if (matched === symbols.length) messageEl.textContent = `You matched them all in ${moves} moves!`;
+                return;
+            }
+
+            locked = true;
+            window.setTimeout(() => {
+                for (const item of openCards) {
+                    item.card.textContent = '?';
+                    item.card.classList.remove('revealed');
+                    item.card.setAttribute('aria-label', 'Hidden card');
+                }
+                openCards = [];
+                locked = false;
+            }, 750);
+        }
+
+        document.getElementById('restart').addEventListener('click', startGame);
+        startGame();
+    </script>
+</body>
+</html>

@@ -60,11 +60,29 @@ header.scrolled{background:rgba(5,5,7,.85);padding:14px 0;border-bottom:1px soli
 .nav-links a:hover::after{width:100%}
 .nav-actions{display:flex;gap:14px;align-items:center}
 .nav-actions .btn{padding:12px 26px;font-size:.78rem}
-.menu-toggle{display:none;font-size:1.5rem;z-index:1001;background:none;border:none;color:var(--text)}
-.mobile-menu{position:fixed;inset:0;background:rgba(5,5,7,.98);backdrop-filter:blur(25px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:28px;z-index:1000;opacity:0;pointer-events:none;transition:var(--t)}
-.mobile-menu.active{opacity:1;pointer-events:all}
-.mobile-menu a{font-family:var(--fh);font-size:1.7rem;text-transform:uppercase}
-.mobile-menu a:hover{color:var(--p)}
+.menu-toggle{display:none;width:46px;height:46px;background:rgba(204,255,0,.08);border:1px solid rgba(204,255,0,.35);border-radius:8px;color:var(--text);z-index:1001;position:relative;transition:var(--t)}
+.menu-toggle:hover{background:var(--p);box-shadow:0 0 20px var(--glow)}
+.menu-toggle span{position:absolute;left:12px;right:12px;height:2px;background:var(--p);border-radius:2px;transition:var(--t)}
+.menu-toggle:hover span{background:#000}
+.menu-toggle span:nth-child(1){top:15px}.menu-toggle span:nth-child(2){top:22px;right:20px}.menu-toggle span:nth-child(3){top:29px}
+.menu-toggle.open span:nth-child(1){top:22px;transform:rotate(45deg)}.menu-toggle.open span:nth-child(2){opacity:0}.menu-toggle.open span:nth-child(3){top:22px;transform:rotate(-45deg)}
+#menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:1050;opacity:0;pointer-events:none;transition:opacity .35s}
+#menu-backdrop.active{opacity:1;pointer-events:all}
+.mobile-menu{position:fixed;top:0;right:0;height:100%;width:min(380px,88vw);background:linear-gradient(160deg,#0f1511,#050507 70%);border-left:1px solid rgba(204,255,0,.25);box-shadow:-20px 0 60px rgba(0,0,0,.6);z-index:1100;display:flex;flex-direction:column;padding:24px 26px 30px;transform:translateX(105%);transition:transform .45s cubic-bezier(.16,1,.3,1);overflow-y:auto}
+.mobile-menu.active{transform:none}
+.mm-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}
+.mm-close{width:46px;height:46px;border-radius:8px;border:1px solid rgba(204,255,0,.35);background:rgba(204,255,0,.08);color:var(--p);font-size:1.3rem;transition:var(--t)}
+.mm-close:hover{background:var(--p);color:#000;transform:rotate(90deg)}
+.mm-nav{display:flex;flex-direction:column;gap:6px}
+.mm-nav a{display:flex;align-items:center;gap:16px;padding:16px 18px;font-family:var(--fh);font-size:1rem;text-transform:uppercase;border-radius:8px;border:1px solid transparent;opacity:0;transform:translateX(30px);transition:all .4s cubic-bezier(.16,1,.3,1)}
+.mm-nav a i{width:22px;color:var(--p);text-align:center}
+.mm-nav a:hover{background:rgba(204,255,0,.07);border-color:rgba(204,255,0,.3);color:var(--p);padding-left:26px}
+.mobile-menu.active .mm-nav a{opacity:1;transform:none}
+.mobile-menu.active .mm-nav a:nth-child(1){transition-delay:.12s}.mobile-menu.active .mm-nav a:nth-child(2){transition-delay:.18s}.mobile-menu.active .mm-nav a:nth-child(3){transition-delay:.24s}.mobile-menu.active .mm-nav a:nth-child(4){transition-delay:.3s}
+.mm-cta{display:grid;gap:12px;margin-top:auto;padding-top:30px}
+.mm-social{display:flex;justify-content:center;gap:22px;margin-top:26px;color:var(--muted);font-size:1.2rem}
+.mm-social a:hover{color:var(--p)}
+body.menu-open{overflow:hidden}
 
 /* HERO */
 .hero{min-height:100vh;position:relative;display:flex;align-items:center;padding:140px 0 90px;overflow:hidden;background:radial-gradient(ellipse at 75% 40%,rgba(204,255,0,.09),transparent 55%),var(--bg)}
@@ -266,19 +284,34 @@ footer{background:#020203;padding:90px 0 36px;border-top:1px solid var(--line)}
     <div class="nav-actions">
       <a href="login.html" class="btn btn-outline">Login</a>
       <a href="signup.html" class="btn btn-primary">Sign Up</a>
-      <button class="menu-toggle" id="menu-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
 
-<div class="mobile-menu" id="mobile-menu">
-  <a href="#games">Games</a>
-  <a href="#">Leaderboards</a>
-  <a href="#">Tournaments</a>
-  <a href="#">Community</a>
-  <a href="login.html">Login</a>
-  <a href="signup.html" class="btn btn-primary" style="margin-top:20px">Sign Up Free</a>
-</div>
+<div id="menu-backdrop"></div>
+<aside class="mobile-menu" id="mobile-menu" aria-hidden="true" aria-label="Main menu">
+  <div class="mm-head">
+    <a href="#" class="logo"><i class="fa-solid fa-gamepad"></i> ZONO</a>
+    <button class="mm-close" id="menu-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="mm-nav">
+    <a href="#games"><i class="fa-solid fa-gamepad"></i> Games</a>
+    <a href="#"><i class="fa-solid fa-ranking-star"></i> Leaderboards</a>
+    <a href="#"><i class="fa-solid fa-trophy"></i> Tournaments</a>
+    <a href="#"><i class="fa-solid fa-users"></i> Community</a>
+  </nav>
+  <div class="mm-cta">
+    <a href="login.html" class="btn btn-outline">Login</a>
+    <a href="signup.html" class="btn btn-primary">Sign Up Free</a>
+  </div>
+  <div class="mm-social">
+    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+    <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+    <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+  </div>
+</aside>
 
 <!-- HERO -->
 <section class="hero">
@@ -483,11 +516,21 @@ footer{background:#020203;padding:90px 0 36px;border-top:1px solid var(--line)}
 const header=document.getElementById('header');
 window.addEventListener('scroll',()=>header.classList.toggle('scrolled',window.scrollY>50));
 
-// Mobile menu
-const menuToggle=document.getElementById('menu-toggle'),mobileMenu=document.getElementById('mobile-menu'),menuIcon=menuToggle.querySelector('i');
-function setMenu(open){mobileMenu.classList.toggle('active',open);menuIcon.className=open?'fa-solid fa-xmark':'fa-solid fa-bars'}
+// Mobile menu (open, close via X, backdrop, Esc, link tap or resize)
+const menuToggle=document.getElementById('menu-toggle'),mobileMenu=document.getElementById('mobile-menu'),backdrop=document.getElementById('menu-backdrop');
+function setMenu(open){
+  mobileMenu.classList.toggle('active',open);backdrop.classList.toggle('active',open);
+  menuToggle.classList.toggle('open',open);document.body.classList.toggle('menu-open',open);
+  menuToggle.setAttribute('aria-expanded',open);menuToggle.setAttribute('aria-label',open?'Close menu':'Open menu');
+  mobileMenu.setAttribute('aria-hidden',!open);
+  if(open)document.getElementById('menu-close').focus();else if(document.activeElement&&mobileMenu.contains(document.activeElement))menuToggle.focus();
+}
 menuToggle.addEventListener('click',()=>setMenu(!mobileMenu.classList.contains('active')));
+document.getElementById('menu-close').addEventListener('click',()=>setMenu(false));
+backdrop.addEventListener('click',()=>setMenu(false));
 mobileMenu.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>setMenu(false)));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+window.addEventListener('resize',()=>{if(window.innerWidth>768)setMenu(false)});
 
 // Cursor
 const dot=document.getElementById('cursor-dot'),out=document.getElementById('cursor-outline');

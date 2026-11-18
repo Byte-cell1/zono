@@ -83,7 +83,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
  <div class="grid" id="lplayers"></div>
  <p id="lstat"></p>
  <div class="row"><button class="btn pri" id="start">Start game</button><button class="btn" id="copy">Copy invite link</button><button class="btn" id="back">Leave</button></div>
- <p style="margin-top:14px;font-size:.8rem;color:var(--text-muted)">Desktop: WASD move · Shift run · Drag mouse to look · Wheel zoom · E use · Q kill · R report</p>
+ <p style="margin-top:14px;font-size:.8rem;color:var(--text-muted)">Desktop: WASD move · Shift run · Drag mouse to look · Wheel zoom · E use / enter · F car · Q kill · R report</p>
 </div></div>
 
 <div class="ov hide" id="banner"><div id="big"></div></div>
@@ -182,6 +182,79 @@ function lights(){
 const M_ = (c,o={}) => new T.MeshStandardMaterial(Object.assign({color:c,roughness:.85},o));
 function box(w,h,d,mat,x,y,z,parent){ const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat); m.position.set(x,y,z); m.castShadow=m.receiveShadow=true; parent.add(m); return m; }
 
+/* ---------- HOUSE INTERIORS ---------- */
+const interiors = [];              // { id, x, z, group, exit:{x,z}, walls:[{x,z,r}] }
+const interiorColliders = [];      // only active while insideHouse
+let insideHouse = null;            // interior object or null
+const INTERIOR_Y = -200;           // far below the world so interiors never collide
+
+function buildInterior(id, cx, cz, tint){
+  const g = new T.Group();
+  g.position.set(cx, INTERIOR_Y, cz);
+  const W = 8, D = 8, H = 3;
+  // floor
+  const floor = new T.Mesh(new T.BoxGeometry(W, .2, D), M_(0x3a2a20, {roughness:.9}));
+  floor.position.y = .1; floor.receiveShadow = true; g.add(floor);
+  // walls
+  const wallMat = M_(tint || 0x222230);
+  const wallSpecs = [
+    [W, H, .2, 0, H/2, -D/2],   // back
+    [W, H, .2, 0, H/2,  D/2],   // front
+    [.2, H, D, -W/2, H/2, 0],   // left
+    [.2, H, D,  W/2, H/2, 0]    // right
+  ];
+  const walls = [];
+  wallSpecs.forEach(([w,h,d,x,y,z]) => {
+    const m = new T.Mesh(new T.BoxGeometry(w,h,d), wallMat);
+    m.position.set(x,y,z); m.castShadow = m.receiveShadow = true; g.add(m);
+  });
+  // doorway gap on the front wall — cut by adding a frame instead of solid
+  // (kept simple: front wall exists, "exit" teleports you to the door outside)
+  // furniture
+  const crate = new T.Mesh(new T.BoxGeometry(1.4,1.4,.9), M_(0x5c4a3a)); crate.position.set(1.8,.7,-1.8); crate.castShadow = true; g.add(crate);
+  const table = new T.Mesh(new T.BoxGeometry(.9,.8,.9), M_(0x4a3a5c)); table.position.set(-1.8,.4,1.6); table.castShadow = true; g.add(table);
+  // a warm lamp
+  const lamp = new T.PointLight(0xffd9a0, 1.2, 12); lamp.position.set(0, 2.4, 0); g.add(lamp);
+  const bulb = new T.Mesh(new T.SphereGeometry(.16,8,8), new T.MeshBasicMaterial({color:0xffe2a8})); bulb.position.copy(lamp.position); g.add(bulb);
+  scene.add(g);
+  // interior colliders in interior-local space offset by cx, cz
+  const wallR = 0.4;
+  walls.push(
+    { x: cx - W/2, z: cz, r: wallR, span:'v' },
+    { x: cx + W/2, z: cz, r: wallR, span:'v' },
+    { x: cx, z: cz - D/2, r: wallR, span:'h' },
+    { x: cx, z: cz + D/2, r: wallR, span:'h' }
+  );
+  const interior = { id, x: cx, z: cz, group: g, walls, W, D };
+  interiors.push(interior);
+  return interior;
+}
+
+function enterHouse(h){
+  if (!h) return;
+  insideHouse = h;
+  mp.x = h.x; mp.z = h.z;
+  if (P[me.uid]) {
+    P[me.uid].mesh.position.set(mp.x, INTERIOR_Y + 0.05, mp.z);
+    camT.set(mp.x, INTERIOR_Y, mp.z);
+  }
+  toast('You entered a house');
+  beep(440,.12);
+}
+function exitHouse(){
+  if (!insideHouse) return;
+  mp.x = insideHouse.x + 4.5;
+  mp.z = insideHouse.z + 4.5;
+  insideHouse = null;
+  if (P[me.uid]) {
+    P[me.uid].mesh.position.set(mp.x, 0, mp.z);
+    camT.set(mp.x, 0, mp.z);
+  }
+  toast('You left the house');
+  beep(320,.1);
+}
+
+/* ---------- houses (outer) ---------- */
 function cottage(x,z,color){
  const g=new T.Group(), w=5.5,d=5,h=3; g.position.set(x,0,z); g.rotation.y=Math.atan2(-x,-z);
  box(w,h,d,M_(color),0,h/2,0,g);
@@ -197,7 +270,8 @@ function cottage(x,z,color){
  [-w*.3,w*.3].forEach(sx=>box(.9,.9,.1,gl,sx,1.8,d/2+.03,g));
  box(.1,.9,.9,gl,w/2+.03,1.8,0,g);
  const l=new T.PointLight(0xffc977,.7,10); l.position.set(0,1.8,d/2+1.2); g.add(l);
- scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+.9}); houses.push(g);
+ scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+.9,house:true}); houses.push(g);
+ buildInterior('cottage_'+x+'_'+z, x, z, color);
 }
 function townhouse(x,z,color){
  const g=new T.Group(), w=4.5,d=6,h=6.5; g.position.set(x,0,z); g.rotation.y=Math.atan2(-x,-z);
@@ -209,7 +283,8 @@ function townhouse(x,z,color){
  for(let fy=1.5;fy<h;fy+=2.2) for(let wx=-w/2+.9;wx<w/2;wx+=1.4) box(.6,.8,.1,gl,wx,fy,d/2+.02,g);
  box(1,2,.12,M_(0x2a1c14),0,1,d/2+.03,g);
  const l=new T.PointLight(0xffc977,.6,10); l.position.set(0,2,d/2+1); g.add(l);
- scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+1}); houses.push(g);
+ scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+1,house:true}); houses.push(g);
+ buildInterior('townhouse_'+x+'_'+z, x, z, color);
 }
 function manor(x,z,color){
  const g=new T.Group(), w=8,d=6,h=4.2; g.position.set(x,0,z); g.rotation.y=Math.atan2(-x,-z);
@@ -224,7 +299,8 @@ function manor(x,z,color){
  box(1.4,2.4,.12,M_(0x2a1c14),0,1.2,d/2+.03,g);
  [-.9,.9].forEach(sx=>box(.22,2.4,.22,M_(0xf0e8d8),sx,1.2,d/2+.7,g));
  const l=new T.PointLight(0xffc977,1.0,14); l.position.set(0,2,d/2+1.6); g.add(l);
- scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+1.2}); houses.push(g);
+ scene.add(g); colliders.push({x,z,r:Math.max(w,d)/2+1.2,house:true}); houses.push(g);
+ buildInterior('manor_'+x+'_'+z, x, z, color);
 }
 function fountain(x,z){
  const g=new T.Group(); g.position.set(x,0,z);
@@ -276,20 +352,15 @@ let myCar = null, nearCar = null;
 
 function world(){
  lights();
- // ocean
  const ocean = new T.Mesh(new T.PlaneGeometry(600,600,16,16),
    new T.MeshStandardMaterial({color:0x0a3a5a, roughness:.25, metalness:.5, transparent:true, opacity:.92}));
  ocean.rotation.x = -Math.PI/2; ocean.position.y = -0.6; scene.add(ocean);
  world.ocean = ocean;
- // sand beach
  const sand = new T.Mesh(new T.RingGeometry(46, 56, 64), M_(0xd9c08a, {roughness:1}));
  sand.rotation.x = -Math.PI/2; sand.position.y = 0.01; scene.add(sand);
- // grass island
  const gr = new T.Mesh(new T.CircleGeometry(46, 64), M_(0x0f2417));
  gr.rotation.x = -Math.PI/2; gr.position.y = 0.02; gr.receiveShadow = true; scene.add(gr);
- // paths
  [[90,6,0,0],[6,90,0,0]].forEach(([w,d,x,z])=>{ const r=new T.Mesh(new T.PlaneGeometry(w,d),M_(0x23232c)); r.rotation.x=-Math.PI/2; r.position.set(x,.03,z); r.receiveShadow=true; scene.add(r); });
- // beach props
  [0.4,1.6,2.8,4.0,5.2].forEach(a => {
   const r = 50, x = Math.cos(a)*r, z = Math.sin(a)*r;
   const g = new T.Group(); g.position.set(x,0,z);
@@ -308,7 +379,6 @@ function world(){
  [[-10,-5],[10,5],[-5,10],[5,-10]].forEach(([x,z])=>lamp(x*1.9,z*1.2)); lamp(-20,5.5);lamp(20,-5.5);lamp(5.5,-22);lamp(-5.5,24);
  for(let i=0,n=0;n<46&&i<600;i++){ const x=(Math.random()-.5)*90,z=(Math.random()-.5)*90;
   if(Math.hypot(x,z)>42||Math.abs(x)<6||Math.abs(z)<6||colliders.some(c=>D(x,z,c.x,c.z)<c.r+2.5)) continue; tree(x,z); n++; }
- // cars
  const CAR_SPAWNS = [
   { id:'c1', x: 20, z: 6,  ry: Math.PI/2, color: 0xff3366 },
   { id:'c2', x:-20, z:-6, ry:-Math.PI/2, color: 0x00d4ff },
@@ -391,8 +461,10 @@ const mp = {x:0,z:0,ry:0}; let lastSend = 0, camT = new T.Vector3(), mm = $('mm'
 function near(list,r){ return list.filter(o=>D(mp.x,mp.z,o.x,o.z)<r).sort((a,b)=>D(mp.x,mp.z,a.x,a.z)-D(mp.x,mp.z,b.x,b.z))[0]; }
 function myTaskList(){ return role==='imposter' ? TASKS.map((t,i)=>({...t,i})) : myTasks.map(i=>({...TASKS[i],i})); }
 let ctx = {};
+
 function step(dt,now){
  const play = G.phase==='play', mine = P[me.uid];
+ const yBase = insideHouse ? INTERIOR_Y : 0;
  if(play && mine){
   if(myCar){
    const car = cars[myCar];
@@ -429,38 +501,47 @@ function step(dt,now){
     if(l>1){dx/=l;dz/=l;}
     const speed = sprinting ? 11 : 6.2;
     mp.x += dx * speed * dt; mp.z += dz * speed * dt; mp.ry = Math.atan2(dx,dz);
-    colliders.forEach(c=>{ const ex=mp.x-c.x,ez=mp.z-c.z,d=Math.hypot(ex,ez),m=c.r+.45; if(d<m&&d>0){ mp.x=c.x+ex/d*m; mp.z=c.z+ez/d*m; } });
-    const _R = 46, _d = Math.hypot(mp.x, mp.z);
-    if (_d > _R) { mp.x = mp.x/_d*_R; mp.z = mp.z/_d*_R; }
+    if(!insideHouse){
+     colliders.forEach(c=>{ const ex=mp.x-c.x,ez=mp.z-c.z,d=Math.hypot(ex,ez),m=c.r+.45; if(d<m&&d>0){ mp.x=c.x+ex/d*m; mp.z=c.z+ez/d*m; } });
+     const _R = 46, _d = Math.hypot(mp.x, mp.z);
+     if (_d > _R) { mp.x = mp.x/_d*_R; mp.z = mp.z/_d*_R; }
+    } else {
+     // interior wall clamps: keep you inside the room
+     if (mp.x < insideHouse.x - 3.6) mp.x = insideHouse.x - 3.6;
+     if (mp.x > insideHouse.x + 3.6) mp.x = insideHouse.x + 3.6;
+     if (mp.z < insideHouse.z - 3.6) mp.z = insideHouse.z - 3.6;
+     if (mp.z > insideHouse.z + 3.6) mp.z = insideHouse.z + 3.6;
+    }
     if(busy){ busy=null; $('doing').classList.add('hide'); }
    }
    mine.tx=mp.x; mine.tz=mp.z; mine.ry=mp.ry;
-   if(!myCar && now-lastSend>150 && l>.12){ lastSend=now; setDoc(doc(db,'matches',MID,'pos',me.uid),{x:+mp.x.toFixed(2),z:+mp.z.toFixed(2),ry:+mp.ry.toFixed(2)}).catch(()=>{}); }
+   if(!myCar && !insideHouse && now-lastSend>150 && l>.12){ lastSend=now; setDoc(doc(db,'matches',MID,'pos',me.uid),{x:+mp.x.toFixed(2),z:+mp.z.toFixed(2),ry:+mp.ry.toFixed(2)}).catch(()=>{}); }
    if(busy){ const p=(now-busy.s)/2000; $('doing').lastElementChild.firstElementChild.style.width=Math.min(100,p*100)+'%'; if(p>=1) finishTask(); }
   }
  }
  Object.entries(P).forEach(([u,p])=>{ const m=p.mesh, me_=u===me.uid; const k=me_?1:Math.min(1,dt*10);
-  if(!(myCar && me_)){
+  if(!(myCar && me_) && !(insideHouse && me_)){
    m.position.x+=(p.tx-m.position.x)*k; m.position.z+=(p.tz-m.position.z)*k;
   }
   let d=p.ry-m.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); m.rotation.y+=d*Math.min(1,dt*12);
-  m.position.y=Math.abs(Math.sin(now/130+u.length))*.05*(Math.hypot(p.tx-m.position.x,p.tz-m.position.z)>.02?1:0);
-  const dead=isDead(u), iDead=isDead(me.uid); m.visible = (!dead || iDead || G.phase==='lobby') && !(myCar && u===me.uid);
+  m.position.y = (insideHouse && me_) ? (INTERIOR_Y + 0.05) : Math.abs(Math.sin(now/130+u.length))*.05*(Math.hypot(p.tx-m.position.x,p.tz-m.position.z)>.02?1:0);
+  const dead=isDead(u), iDead=isDead(me.uid);
+  m.visible = ((!dead || iDead || G.phase==='lobby') && !(myCar && u===me.uid) && !(insideHouse && u===me.uid)) || (!insideHouse && (myCar||!myCar) && me_ && !myCar && !dead);
   m.traverse(o=>{ if(o.material&&o.material.opacity!==undefined&&!o.isSprite){ o.material.transparent=dead; o.material.opacity=dead?.4:1; } }); });
  if (mine) {
-  const target = new T.Vector3(mine.mesh.position.x, 1, mine.mesh.position.z);
+  const target = new T.Vector3(mine.mesh.position.x, (insideHouse ? INTERIOR_Y : 1), mine.mesh.position.z);
   const offset = new T.Vector3(
     Math.sin(camYaw) * Math.cos(camPitch),
     Math.sin(camPitch),
     Math.cos(camYaw) * Math.cos(camPitch)
   ).multiplyScalar(camDist);
   const want = target.clone().add(offset);
-  want.y = Math.max(2.5, want.y);
+  want.y = Math.max((insideHouse ? INTERIOR_Y : 0) + 2.5, want.y);
   cam.position.lerp(want, Math.min(1, dt * 8));
   camT.lerp(target, Math.min(1, dt * 10));
   cam.lookAt(camT);
  }
- rings.forEach((g,i)=>{ const mineT=role==='imposter'||myTasks.includes(i), d=done.has(i); g.visible=!d&&mineT&&G.phase!=='lobby'; g.userData.r.rotation.z+=dt*2; g.userData.r.position.y=.3+Math.sin(now/400+i)*.12; g.userData.bm.material.opacity=role==='imposter'?.12:.35; });
+ rings.forEach((g,i)=>{ const mineT=role==='imposter'||myTasks.includes(i), d=done.has(i); g.visible=!d&&mineT&&G.phase!=='lobby'&&!insideHouse; g.userData.r.rotation.z+=dt*2; g.userData.r.position.y=.3+Math.sin(now/400+i)*.12; g.userData.bm.material.opacity=role==='imposter'?.12:.35; });
  houses.forEach(h=>{ if(h.userData.smoke){ const s=h.userData.smoke.geometry.attributes.position; for(let i=1;i<s.count*3;i+=3){ s.array[i]+=dt*.4; if(s.array[i]>3) s.array[i]=0; } s.needsUpdate=true; } });
  updateDayNight(dt);
  const blk = (G.blackoutUntil||0) > Date.now() && role !== 'imposter';
@@ -469,11 +550,14 @@ function step(dt,now){
  $('vig').style.opacity = blk ? 1 : 0;
  const alive=!isDead(me.uid), tk=near(myTaskList().filter(t=>!done.has(t.i)),2.8), bell=D(mp.x,mp.z,0,0)<4.4&&!usedBell&&alive, body=near((G.bodies||[]).map(b=>({...b})),3.2),
   vic=role==='imposter'&&alive&&Date.now()>killCd?near(M.players.filter(u=>u!==me.uid&&!isDead(u)&&P[u]).map(u=>({u,x:P[u].tx,z:P[u].tz})),2.7):null;
- ctx={tk,bell,body,vic};
+ const nearHouse = !insideHouse && !myCar ? houses.find(h => D(mp.x,mp.z,h.position.x,h.position.z) < 3.6) : null;
+ ctx={tk,bell,body,vic,nearHouse};
  nearCar = Object.values(cars).find(c => !c.driver && c.id !== myCar && D(mp.x, mp.z, c.x, c.z) < 3.5) || null;
  $('bCar').disabled = !(play && (myCar || nearCar));
  $('bCar').textContent = myCar ? 'Exit car' : 'Enter car';
- $('bUse').disabled=!(play&&(bell||tk)); $('bUse').textContent=bell?'Emergency':tk?tk.n:'Use';
+ const useDisabled = !(play && (insideHouse || bell || tk || nearHouse));
+ $('bUse').disabled = useDisabled;
+ $('bUse').textContent = insideHouse ? 'Exit house' : (bell ? 'Emergency' : (tk ? tk.n : (nearHouse ? 'Enter house' : 'Use')));
  $('bRep').disabled=!(play&&body&&alive);
  $('bKill').disabled=!(play&&vic); $('bKill').textContent=role==='imposter'&&Date.now()<killCd?'Wait '+Math.ceil((killCd-Date.now())/1000)+'s':'Eliminate';
  $('bBlk').disabled=!(play&&Date.now()>blkCd); $('bBlk').textContent=Date.now()<blkCd?'Wait '+Math.ceil((blkCd-Date.now())/1000)+'s':'Blackout';
@@ -511,16 +595,22 @@ $('mapBtn').onclick = () => { $('fullmap').classList.remove('hide'); drawFullMap
 $('fmapClose').onclick = () => { $('fullmap').classList.add('hide'); clearInterval(mapTimer); mapTimer = null; };
 
 /* ---------- actions ---------- */
-$('bUse').onclick = () => { if(G.phase!=='play') return; const {bell,tk}=ctx;
+$('bUse').onclick = () => {
+ if(G.phase!=='play') return;
+ if(insideHouse){ exitHouse(); return; }
+ const {bell,tk,nearHouse}=ctx;
+ if(nearHouse){ enterHouse(interiors.find(it => it.x === nearHouse.position.x && it.z === nearHouse.position.z)); return; }
  if(bell){ usedBell=true; call('emergency'); return; }
- if(tk&&!busy){ busy={i:tk.i,s:performance.now()}; $('dn').textContent=tk.n+'…'; $('doing').classList.remove('hide'); beep(300,.1); } };
+ if(tk&&!busy){ busy={i:tk.i,s:performance.now()}; $('dn').textContent=tk.n+'…'; $('doing').classList.remove('hide'); beep(300,.1); }
+};
 function finishTask(){ const i=busy.i; busy=null; $('doing').classList.add('hide'); done.add(i); beep(660,.2);
  if(role==='crew'){ updateDoc(mref,{'g.tasksDone':increment(1)}).catch(e=>console.warn(e)); toast('Task complete'); } else toast('Faked it. Nobody noticed.'); }
-$('bKill').onclick = () => { const v=ctx.vic; if(!v||G.phase!=='play') return; killCd=Date.now()+20000; beep(120,.3,'sawtooth');
+$('bKill').onclick = () => { const v=ctx.vic; if(!v||G.phase!=='play'||insideHouse) return; killCd=Date.now()+20000; beep(120,.3,'sawtooth');
  updateDoc(mref,{'g.dead':arrayUnion(v.u),'g.bodies':arrayUnion({u:v.u,x:+v.x.toFixed(2),z:+v.z.toFixed(2)})}).catch(e=>console.warn(e)); mp.x=v.x; mp.z=v.z; };
-$('bRep').onclick = () => { if(ctx.body) call('body'); };
+$('bRep').onclick = () => { if(ctx.body && !insideHouse) call('body'); };
 $('bBlk').onclick = () => { if(role!=='imposter'||Date.now()<blkCd) return; blkCd=Date.now()+45000; updateDoc(mref,{'g.blackoutUntil':Date.now()+12000}).catch(e=>console.warn(e)); toast('Blackout for 12 seconds'); };
 $('bCar').onclick = async () => {
+  if (insideHouse) { toast('Exit the house first', true); return; }
   if (myCar) {
     const car = cars[myCar];
     car.driver = null; myCar = null;
@@ -548,7 +638,7 @@ async function loadUsers(){
  await Promise.all([...need].filter(u=>!U[u]).map(async u=>{ try{ const s=await getDoc(doc(db,'users',u)); if(s.exists()) U[u]=s.data(); }catch(e){ console.warn('user read',u,e); } }));
  M.players.forEach(ensure);
 }
-function spawn(){ const i=Math.max(0,M.players.indexOf(me.uid)),a=i/Math.max(M.players.length,1)*Math.PI*2; mp.x=Math.cos(a)*7; mp.z=Math.sin(a)*7; if(P[me.uid]){ P[me.uid].tx=mp.x; P[me.uid].tz=mp.z; P[me.uid].mesh.position.set(mp.x,0,mp.z); camT.set(mp.x,0,mp.z); } }
+function spawn(){ const i=Math.max(0,M.players.indexOf(me.uid)),a=i/Math.max(M.players.length,1)*Math.PI*2; mp.x=Math.cos(a)*7; mp.z=Math.sin(a)*7; insideHouse=null; if(P[me.uid]){ P[me.uid].tx=mp.x; P[me.uid].tz=mp.z; P[me.uid].mesh.position.set(mp.x,0,mp.z); camT.set(mp.x,0,mp.z); } }
 async function onMatch(s){
  if(!s.exists()){ location.href='../dashboard.html'; return; }
  M=s.data(); G=M.g||{phase:'lobby'};
@@ -576,9 +666,9 @@ async function onMatch(s){
  if(isDead(me.uid)&&role&&!ctx.deadNotified&&ph==='play'){ ctx.deadNotified=true; toast('You were eliminated. Keep doing tasks as a ghost.'); beep(90,.5,'sawtooth'); }
  if(ph!==lastPh){ const prev=lastPh; lastPh=ph;
   ['lobby','meet','end'].forEach(k=>$(k).classList.add('hide')); $('banner').classList.add('hide');
-  if(ph==='lobby'){ $('lobby').classList.remove('hide'); role=null; ctx.deadNotified=false; killCd=0; Object.values(P).forEach(p=>p.mesh.visible=true); }
+  if(ph==='lobby'){ $('lobby').classList.remove('hide'); role=null; ctx.deadNotified=false; killCd=0; insideHouse=null; Object.values(P).forEach(p=>p.mesh.visible=true); }
   if(ph==='play'){ if(['','lobby','end'].includes(prev)) await initRound(); else { killCd=Date.now()+10000; } }
-  if(ph==='meeting'){ beep(520,.4,'square'); busy=null; $('doing').classList.add('hide'); spawn(); $('meet').classList.remove('hide'); renderMeeting(); }
+  if(ph==='meeting'){ beep(520,.4,'square'); busy=null; $('doing').classList.add('hide'); insideHouse=null; spawn(); $('meet').classList.remove('hide'); renderMeeting(); }
   if(ph==='result'){ const e=G.ejected; $('big').innerHTML=e&&e.u?`${esc(nameOf(e.u))} was ejected.<br><small style="font-size:.45em;color:${e.imp?'#ccff00':'#ff3366'}">${e.imp?'They were the imposter.':'They were not the imposter.'}</small>`:'No one was ejected.'; $('banner').classList.remove('hide'); }
   if(ph==='end'){ const c=G.winner==='crew'; $('etitle').textContent=c?'Town wins':'The imposter wins'; $('etitle').style.color=c?'#ccff00':'#ff3366'; $('esub').textContent='The imposter was '+nameOf(G.imp)+'.'; $('again').classList.toggle('hide',!isHost()); $('end').classList.remove('hide'); beep(c?880:140,.6); }
  }

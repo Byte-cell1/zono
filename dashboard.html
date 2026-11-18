@@ -55,7 +55,7 @@ a{color:inherit;text-decoration:none}
 
 /* MAIN */
 .main{padding:22px clamp(16px,2.5vw,32px) 40px;display:flex;flex-direction:column;gap:24px;min-width:0;position:relative;z-index:1}
-.topbar{display:flex;align-items:center;gap:12px}
+.topbar{display:flex;align-items:center;gap:12px;position:relative}
 .search{flex:1;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:11px 14px;min-width:0}
 .search i{color:var(--mut);font-size:.9rem}
 .search input{flex:1;min-width:0;background:none;border:0;outline:none;color:#fff;font:500 15px var(--fb)}
@@ -64,6 +64,32 @@ a{color:inherit;text-decoration:none}
 .icon-btn:hover{color:var(--tx);background:rgba(255,255,255,.1)}
 .icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--flare);border:2px solid var(--bg)}
 .icon-btn.menu-btn{display:none;color:var(--mint);border-color:rgba(204,255,0,.3)}
+
+/* notif bell + panel */
+#notif-btn{position:relative}
+#notif-btn .count{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:var(--flare);color:#fff;font-size:.62rem;font-weight:800;display:grid;place-items:center;padding:0 5px;border:2px solid var(--bg);font-family:var(--fb)}
+#notif-btn.pulse{animation:notifPulse .8s ease}
+@keyframes notifPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.notif-panel{position:fixed;top:70px;right:calc(300px + 28px);width:360px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:16px;z-index:10002;box-shadow:0 20px 60px rgba(0,0,0,.6);max-height:70vh;overflow-y:auto;display:none}
+.notif-panel.on{display:block;animation:pop .2s}
+@keyframes pop{from{opacity:0;transform:scale(.95)}}
+.notif-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);z-index:1}
+.notif-head b{font-family:var(--fh);font-size:.85rem}
+.notif-head button{font-size:.7rem;color:var(--mint);font-weight:800;padding:4px 10px;border-radius:8px;background:rgba(204,255,0,.1)}
+.notif-head button:hover{background:rgba(204,255,0,.2)}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);transition:.15s;cursor:pointer}
+.notif-item:last-child{border-bottom:0}
+.notif-item.unread{background:rgba(204,255,0,.05)}
+.notif-item:hover{background:rgba(255,255,255,.04)}
+.notif-item .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:.9rem;flex-shrink:0}
+.notif-item .ico.mention{background:rgba(0,212,255,.15);color:var(--blue)}
+.notif-item .ico.tourney{background:rgba(255,159,28,.15);color:var(--amber)}
+.notif-item .ico.prize{background:rgba(204,255,0,.15);color:var(--mint)}
+.notif-item .body{flex:1;min-width:0;font-size:.8rem;line-height:1.4}
+.notif-item .body b{color:var(--mint)}
+.notif-item .body .time{font-size:.65rem;color:var(--mut);margin-top:2px}
+.notif-item .body .preview{color:var(--mut);font-size:.75rem;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notif-empty{padding:30px 14px;text-align:center;color:var(--mut);font-size:.85rem}
 
 /* HERO — shows YOU */
 .hero{position:relative;border-radius:22px;overflow:hidden;min-height:320px;background:linear-gradient(120deg,#1a0a14,#0a0a1a 60%,#0f1a0a);border:1px solid var(--line)}
@@ -166,7 +192,6 @@ a{color:inherit;text-decoration:none}
 .mb{position:fixed;inset:0;background:rgba(5,2,12,.85);backdrop-filter:blur(8px);z-index:10001;display:none;align-items:center;justify-content:center;padding:16px}
 .mb.on{display:flex}
 .md{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;animation:pop .25s}
-@keyframes pop{from{opacity:0;transform:scale(.95)}}
 .md h3{font-family:var(--fh);font-size:1.05rem;margin-bottom:6px}
 .md>p{color:var(--mut);font-size:.9rem;margin-bottom:16px}
 .md input.tx{width:100%;padding:14px;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;color:#fff;font:600 16px var(--fb);letter-spacing:2px;text-transform:uppercase;outline:none}
@@ -250,7 +275,8 @@ a{color:inherit;text-decoration:none}
 .msb .discount-card{margin-top:12px}
 
 /* RESPONSIVE */
-@media(max-width:1180px){.app{grid-template-columns:200px minmax(0,1fr) 260px}}
+@media(max-width:1180px){.app{grid-template-columns:200px minmax(0,1fr) 260px}.notif-panel{right:calc(260px + 28px)}}
+@media(max-width:1080px){.notif-panel{right:14px}}
 @media(max-width:920px){
   .app{display:block;grid-template-columns:none}
   .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;border-right:0;border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom));z-index:900;background:rgba(5,5,7,.97);gap:0;overflow:visible}
@@ -269,6 +295,8 @@ a{color:inherit;text-decoration:none}
   .topbar{gap:8px}
   .icon-btn{width:38px;height:38px}
   .icon-btn.menu-btn{display:grid}
+
+  .notif-panel{top:60px;left:12px;right:12px;width:auto;max-width:none}
 
   /* HERO — stack vertically on mobile */
   .hero{min-height:auto}
@@ -331,11 +359,11 @@ a{color:inherit;text-decoration:none}
       <div class="nav-head">Main</div>
       <button class="nav-link on" data-tab="home" data-mob="show"><i class="fa-solid fa-house"></i><span>Home</span></button>
       <button class="nav-link" data-tab="games" data-mob="show"><i class="fa-solid fa-dice-d20"></i><span>Games</span></button>
+      <a class="nav-link" href="tournament.html" data-mob="show"><i class="fa-solid fa-trophy"></i><span>Tournaments</span></a>
       <a class="nav-link" href="history.html" data-mob="show"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a>
-      <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-trophy"></i><span>Events</span></a>
+      <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-ranking-star"></i><span>Leaderboard</span></a>
       <button class="nav-link" data-tab="friends" data-mob="show"><i class="fa-solid fa-user-group"></i><span>Friends</span><span class="badge" id="f-badge">0</span></button>
       <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-heart"></i><span>Wishlist</span></a>
-      <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-download"></i><span>Downloads</span></a>
       <button class="nav-link more-btn" id="more-btn" type="button" data-mob="show" aria-label="Open menu"><i class="fa-solid fa-bars"></i><span>Menu</span></button>
     </div>
 
@@ -361,8 +389,10 @@ a{color:inherit;text-decoration:none}
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="search" placeholder="Search games, friends, events…" autocomplete="off">
       </div>
-      <button class="icon-btn" aria-label="Messages"><i class="fa-regular fa-envelope"></i><span class="dot"></span></button>
-      <button class="icon-btn" aria-label="Notifications"><i class="fa-regular fa-bell"></i></button>
+      <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <span class="count" id="notif-count" hidden>0</span>
+      </button>
     </div>
 
     <!-- HERO — shows YOU -->
@@ -386,7 +416,7 @@ a{color:inherit;text-decoration:none}
           <div class="hero-actions">
             <button class="hero-btn pri" id="hero-edit"><i class="fa-solid fa-wand-magic-sparkles"></i> Edit character</button>
             <a class="hero-btn gho" href="games/imposter.html"><i class="fa-solid fa-play"></i> Play Imposter</a>
-            <a class="hero-btn gho" href="games/war.html"><i class="fa-solid fa-crosshair"></i> War Mode</a>
+            <a class="hero-btn gho" href="tournament.html"><i class="fa-solid fa-trophy"></i> Tournaments</a>
           </div>
         </div>
         <div class="hero-preview">
@@ -464,8 +494,10 @@ a{color:inherit;text-decoration:none}
     <div class="nav-head">Navigate</div>
     <button class="nav-link" type="button" data-go="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
     <button class="nav-link" type="button" data-go="games"><i class="fa-solid fa-dice-d20"></i><span>Games</span></button>
+    <a class="nav-link" href="tournament.html"><i class="fa-solid fa-trophy"></i><span>Tournaments</span></a>
     <button class="nav-link" type="button" data-go="friends"><i class="fa-solid fa-user-group"></i><span>Friends</span><span class="badge" id="m-badge">0</span></button>
     <a class="nav-link" href="history.html"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a>
+    <a class="nav-link" href="#"><i class="fa-solid fa-ranking-star"></i><span>Leaderboard</span></a>
   </div>
 
   <div class="nav-group">
@@ -478,7 +510,6 @@ a{color:inherit;text-decoration:none}
 
   <div class="nav-group">
     <div class="nav-head">More</div>
-    <a class="nav-link" href="#"><i class="fa-solid fa-trophy"></i><span>Events</span></a>
     <a class="nav-link" href="#"><i class="fa-solid fa-heart"></i><span>Wishlist</span></a>
     <a class="nav-link" href="#"><i class="fa-solid fa-download"></i><span>Downloads</span></a>
     <a class="nav-link" href="#"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
@@ -523,6 +554,16 @@ a{color:inherit;text-decoration:none}
   <div class="msgs" id="msgs"></div>
   <div class="cin"><input id="c-in" placeholder="Type a message…" maxlength="500" autocomplete="off"><button id="c-send" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button></div>
 </div>
+
+<!-- NOTIFICATIONS PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-head">
+    <b>Notifications</b>
+    <button type="button" id="notif-mark">Mark all read</button>
+  </div>
+  <div id="notif-list"></div>
+</div>
+
 <div id="toast"></div>
 
 <script type="module">
@@ -547,7 +588,8 @@ const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 let me = null, meData = null, chatUnsub = null, chatFriend = null, friends = [], inviteGame = null, picked = new Set();
 let draft = null;
-let friendUnsub = null, reqUnsub = null, invUnsub = null;
+let friendUnsub = null, reqUnsub = null, invUnsub = null, notifUnsub = null;
+let notifications = [];
 
 /* ---------- RANKS ---------- */
 const RANKS = [
@@ -637,6 +679,114 @@ function toast(m, bad){ const t=$('toast'); t.textContent=m; t.style.borderColor
 function genId(){ const ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let o='ZONO-'; for(let i=0;i<6;i++) o+=ch[Math.floor(Math.random()*ch.length)]; return o; }
 async function uniqueId(){ for(;;){ const id=genId(); if((await getDocs(query(collection(db,'users'),where('zonoId','==',id)))).empty) return id; } }
 const open = id => $(id).classList.add('on'), close = id => $(id).classList.remove('on');
+
+/* ---------- SOUND PING ---------- */
+let audioCtx = null;
+function pingMention(){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.frequency.value = 880;
+    o.type = 'sine';
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+    o.start(); o.stop(audioCtx.currentTime + 0.4);
+  } catch(e){}
+}
+
+/* ---------- NOTIFICATIONS ---------- */
+function renderNotifList(){
+  const box = $('notif-list');
+  if (!notifications.length){
+    box.innerHTML = '<div class="notif-empty">No notifications yet.<br><small style="opacity:.7">Mentions, tournament starts and prizes appear here.</small></div>';
+    return;
+  }
+  box.innerHTML = notifications.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}" data-type="${n.type || 'bell'}">
+      <div class="ico ${n.type || 'bell'}"><i class="fa-solid ${n.type === 'mention' ? 'fa-at' : n.type === 'prize' ? 'fa-trophy' : n.type === 'tourney' ? 'fa-bolt' : 'fa-bell'}"></i></div>
+      <div class="body">
+        <div>${n.html || ''}</div>
+        <div class="preview">${esc(n.preview || '')}</div>
+        <div class="time">${esc(n.time || 'just now')}</div>
+      </div>
+    </div>`).join('');
+  box.querySelectorAll('.notif-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const type = el.dataset.type;
+      $('notif-panel').classList.remove('on');
+      if (type === 'mention' || type === 'tourney' || type === 'prize'){
+        location.href = 'tournament.html';
+      }
+    });
+  });
+}
+
+function updateNotifBadge(){
+  const badge = $('notif-count');
+  const unread = notifications.filter(n => !n.read).length;
+  if (unread > 0){
+    badge.textContent = unread > 9 ? '9+' : unread;
+    badge.hidden = false;
+    $('notif-btn').classList.add('pulse');
+    setTimeout(() => $('notif-btn').classList.remove('pulse'), 800);
+  } else {
+    badge.hidden = true;
+  }
+}
+
+function startNotifListener(){
+  if (!me) return;
+  if (notifUnsub) notifUnsub();
+  const q = query(
+    collection(db, 'users', me.uid, 'notifications'),
+    orderBy('createdAt', 'desc'),
+    limit(30)
+  );
+  notifUnsub = onSnapshot(q, snap => {
+    const prevUnread = notifications.filter(n => !n.read).length;
+    notifications = [];
+    snap.forEach(d => {
+      const n = d.data() || {};
+      const t = n.createdAt?.toDate
+        ? n.createdAt.toDate().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+        : 'just now';
+      notifications.push({ id: d.id, ...n, time: t });
+    });
+    renderNotifList();
+    updateNotifBadge();
+    // ping only when a new mention arrives
+    const newUnread = notifications.filter(n => !n.read).length;
+    if (newUnread > prevUnread){
+      const newest = notifications.find(n => !n.read && n.type === 'mention');
+      if (newest) pingMention();
+    }
+  }, err => {
+    console.warn('notif listener:', err.message);
+  });
+}
+
+$('notif-btn').onclick = (e) => {
+  e.stopPropagation();
+  $('notif-panel').classList.toggle('on');
+};
+document.addEventListener('click', e => {
+  if (!$('notif-panel').contains(e.target) && !$('notif-btn').contains(e.target)){
+    $('notif-panel').classList.remove('on');
+  }
+});
+$('notif-mark').onclick = async () => {
+  const unread = notifications.filter(n => !n.read);
+  if (!unread.length) return toast('Nothing to mark');
+  try {
+    await Promise.all(unread.map(n => updateDoc(doc(db, 'users', me.uid, 'notifications', n.id), { read: true })));
+    toast('Marked all read');
+  } catch(e){
+    toast('Could not update', true);
+  }
+};
 
 /* ---------- tabs ---------- */
 function setTab(t){
@@ -734,7 +884,6 @@ function updateHero(d){
   $('my-av').innerHTML = avatar(d, true);
   $('my-name').textContent = d.displayName || 'Player';
   $('my-rank').textContent = `${rank.name} · ${(d.xp||0).toLocaleString()} XP`;
-  // mobile sidebar menu
   $('m-av').innerHTML = avatar(d);
   $('m-name').textContent = d.displayName || 'Player';
   $('m-rank').textContent = `${rank.name} · ${(d.xp||0).toLocaleString()} XP`;
@@ -766,6 +915,7 @@ onAuthStateChanged(auth, async user => {
   addEventListener('beforeunload', () => { updateDoc(ref, { online:false, lastSeen:serverTimestamp() }).catch(()=>{}); });
 
   friendsListener(); requestsListener(); invitesListener();
+  startNotifListener();
   renderPlayed();
   $('loading').style.opacity = '0'; setTimeout(() => $('loading').style.display = 'none', 300);
   $('app').classList.add('ready');
@@ -978,7 +1128,6 @@ $('ed-x').onclick = () => close('ed-m');
 $('ed-ok').onclick = async () => {
   try {
     await updateDoc(doc(db,'users',me.uid), { character: draft });
-    // optimistic update
     if (meData) { meData.character = draft; updateHero(meData); }
     close('ed-m'); toast('Character saved');
   } catch(e){ console.error(e); toast('Could not save character', true); }

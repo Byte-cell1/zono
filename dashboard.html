@@ -45,6 +45,7 @@ a{color:inherit;text-decoration:none}
 .nav-link.on{background:rgba(204,255,0,.1);color:var(--mint)}
 .nav-link.on i{color:var(--mint)}
 .nav-link .badge{margin-left:auto;background:var(--flare);color:#fff;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:99px;font-family:var(--fb)}
+.nav-link.more-btn{display:none}
 .nav-sep{height:1px;background:var(--line);margin:12px 8px}
 .nav-head{font-size:.68rem;color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;padding:0 12px;margin-bottom:6px;opacity:.7}
 .discount-card{margin-top:auto;padding:16px;border-radius:16px;background:linear-gradient(150deg,#ff2d6f,#ff9f1c);color:#fff;position:relative;overflow:hidden}
@@ -62,8 +63,9 @@ a{color:inherit;text-decoration:none}
 .icon-btn{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:grid;place-items:center;color:var(--mut);transition:.15s;position:relative;flex-shrink:0}
 .icon-btn:hover{color:var(--tx);background:rgba(255,255,255,.1)}
 .icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--flare);border:2px solid var(--bg)}
+.icon-btn.menu-btn{display:none;color:var(--mint);border-color:rgba(204,255,0,.3)}
 
-/* HERO — now shows YOU */
+/* HERO — shows YOU */
 .hero{position:relative;border-radius:22px;overflow:hidden;min-height:320px;background:linear-gradient(120deg,#1a0a14,#0a0a1a 60%,#0f1a0a);border:1px solid var(--line)}
 .hero::before{content:"";position:absolute;inset:0;background:
   radial-gradient(500px 300px at 80% 20%,rgba(255,51,102,.35),transparent 60%),
@@ -223,6 +225,30 @@ a{color:inherit;text-decoration:none}
 .rank-badge.diamond{background:#a678ff;color:#000}
 .rank-badge.legend{background:#ff3366;color:#fff}
 
+/* MOBILE SIDEBAR MENU (hidden on desktop) */
+.sbd,.msb{display:none}
+.msb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.msb-top .brand{margin:0;padding:0}
+.msb-x{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid var(--line);display:grid;place-items:center;color:var(--mut);font-size:1rem}
+.msb-prof{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:12px}
+.msb-prof .av{width:52px;height:52px;flex-shrink:0;border-radius:50%;background:var(--card-2);display:grid;place-items:center;position:relative}
+.msb-prof .av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.msb-prof .av svg{width:86%}
+.msb-prof .av .rank-badge{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:.5rem;border:2px solid var(--bg);position:absolute;left:-3px;top:-3px}
+.msb-prof .info{flex:1;min-width:0}
+.msb-prof .info b{display:block;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msb-prof .info small{display:block;color:var(--mut);font-size:.75rem;margin-top:1px}
+.msb-id{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;border:1px dashed rgba(204,255,0,.35);background:rgba(204,255,0,.06);margin-bottom:16px;font-size:.8rem}
+.msb-id span{color:var(--mut);font-size:.7rem;display:block}
+.msb-id b{font-family:var(--fh);font-size:.82rem;color:var(--mint);letter-spacing:1px}
+.msb-id button{padding:7px 12px;border-radius:9px;background:var(--mint);color:#050507;font-weight:800;font-size:.72rem;display:inline-flex;align-items:center;gap:5px}
+.msb .nav-link{width:100%;text-align:left;font-size:.95rem;padding:12px}
+.msb .nav-head{margin-top:4px}
+.msb .nav-group{margin-bottom:10px}
+.msb .nav-link.danger{color:var(--flare)}
+.msb .nav-link.danger:hover{background:rgba(255,51,102,.1)}
+.msb .discount-card{margin-top:12px}
+
 /* RESPONSIVE */
 @media(max-width:1180px){.app{grid-template-columns:200px minmax(0,1fr) 260px}}
 @media(max-width:920px){
@@ -235,12 +261,14 @@ a{color:inherit;text-decoration:none}
   .nav-link .badge{position:absolute;top:4px;right:calc(50% - 18px);margin:0;font-size:.55rem;padding:1px 5px}
   .nav-link.on{background:rgba(204,255,0,.12);color:var(--mint)}
   .nav-link[data-mob="hide"]{display:none!important}
+  .rail .nav-link.more-btn{display:flex}
 
   .main{padding:14px 14px calc(100px + env(safe-area-inset-bottom));gap:18px}
   .side{position:static;height:auto;border-left:0;border-top:1px solid var(--line);padding:18px 14px calc(100px + env(safe-area-inset-bottom))}
 
   .topbar{gap:8px}
   .icon-btn{width:38px;height:38px}
+  .icon-btn.menu-btn{display:grid}
 
   /* HERO — stack vertically on mobile */
   .hero{min-height:auto}
@@ -273,6 +301,12 @@ a{color:inherit;text-decoration:none}
   .ed-prev{width:150px}
   .inv{left:12px;right:12px;max-width:none;top:auto;bottom:calc(90px + env(safe-area-inset-bottom))}
   #toast{bottom:calc(100px + env(safe-area-inset-bottom))}
+
+  /* sidebar menu */
+  .sbd{display:block;position:fixed;inset:0;background:rgba(5,2,12,.7);backdrop-filter:blur(4px);z-index:10003;opacity:0;pointer-events:none;transition:opacity .25s}
+  .sbd.on{opacity:1;pointer-events:auto}
+  .msb{display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;width:310px;max-width:86vw;background:#0b0b10;border-right:1px solid var(--line);z-index:10004;transform:translateX(-102%);transition:transform .28s ease;padding:calc(16px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:12px 0 40px rgba(0,0,0,.6)}
+  .msb.open{transform:none}
 }
 
 @media(max-width:420px){
@@ -302,6 +336,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-link" data-tab="friends" data-mob="show"><i class="fa-solid fa-user-group"></i><span>Friends</span><span class="badge" id="f-badge">0</span></button>
       <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-heart"></i><span>Wishlist</span></a>
       <a class="nav-link" href="#" data-mob="hide"><i class="fa-solid fa-download"></i><span>Downloads</span></a>
+      <button class="nav-link more-btn" id="more-btn" type="button" data-mob="show" aria-label="Open menu"><i class="fa-solid fa-bars"></i><span>Menu</span></button>
     </div>
 
     <div class="nav-sep"></div>
@@ -321,6 +356,7 @@ a{color:inherit;text-decoration:none}
 
   <main class="main sec-main">
     <div class="topbar sec-topbar">
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
       <div class="search">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="search" placeholder="Search games, friends, events…" autocomplete="off">
@@ -329,7 +365,7 @@ a{color:inherit;text-decoration:none}
       <button class="icon-btn" aria-label="Notifications"><i class="fa-regular fa-bell"></i></button>
     </div>
 
-    <!-- HERO — now shows YOU -->
+    <!-- HERO — shows YOU -->
     <section class="hero sec-hero">
       <div class="hero-body">
         <div class="hero-info">
@@ -399,6 +435,62 @@ a{color:inherit;text-decoration:none}
     </div>
   </aside>
 </div>
+
+<!-- MOBILE SIDEBAR MENU -->
+<div class="sbd" id="sbd"></div>
+<aside class="msb" id="msb" aria-label="Menu" aria-hidden="true">
+  <div class="msb-top">
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-ghost"></i></div>
+      <span>ZONO</span>
+    </div>
+    <button class="msb-x" id="msb-x" type="button" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="msb-prof">
+    <div class="av" id="m-av"></div>
+    <div class="info">
+      <b id="m-name">Loading…</b>
+      <small id="m-rank">Bronze · 0 XP</small>
+    </div>
+  </div>
+
+  <div class="msb-id">
+    <div><span>Your Zono ID</span><b id="m-zid">ZONO-••••••</b></div>
+    <button type="button" id="m-copy"><i class="fa-regular fa-copy"></i> Copy</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-head">Navigate</div>
+    <button class="nav-link" type="button" data-go="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="nav-link" type="button" data-go="games"><i class="fa-solid fa-dice-d20"></i><span>Games</span></button>
+    <button class="nav-link" type="button" data-go="friends"><i class="fa-solid fa-user-group"></i><span>Friends</span><span class="badge" id="m-badge">0</span></button>
+    <a class="nav-link" href="history.html"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-head">Quick actions</div>
+    <button class="nav-link" type="button" data-act="addfriend"><i class="fa-solid fa-user-plus"></i><span>Add a friend</span></button>
+    <button class="nav-link" type="button" data-act="edit"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Edit character</span></button>
+    <a class="nav-link" href="games/imposter.html"><i class="fa-solid fa-user-secret"></i><span>Play Imposter</span></a>
+    <a class="nav-link" href="games/war.html"><i class="fa-solid fa-crosshair"></i><span>War Mode</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-head">More</div>
+    <a class="nav-link" href="#"><i class="fa-solid fa-trophy"></i><span>Events</span></a>
+    <a class="nav-link" href="#"><i class="fa-solid fa-heart"></i><span>Wishlist</span></a>
+    <a class="nav-link" href="#"><i class="fa-solid fa-download"></i><span>Downloads</span></a>
+    <a class="nav-link" href="#"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+    <a class="nav-link" href="#"><i class="fa-solid fa-circle-question"></i><span>Help</span></a>
+    <button class="nav-link danger" type="button" data-act="logout"><i class="fa-solid fa-right-from-bracket"></i><span>Exit</span></button>
+  </div>
+
+  <div class="discount-card">
+    <b>50% off</b>
+    <small>on the games in the selection this week</small>
+  </div>
+</aside>
 
 <button class="fab" id="fab-add" aria-label="Add friend"><i class="fa-solid fa-user-plus"></i></button>
 
@@ -554,6 +646,43 @@ function setTab(t){
 }
 document.querySelectorAll('.nav-link[data-tab]').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
+/* ---------- mobile sidebar menu ---------- */
+function openMenu(){
+  $('msb').classList.add('open'); $('sbd').classList.add('on');
+  $('msb').setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu(){
+  $('msb').classList.remove('open'); $('sbd').classList.remove('on');
+  $('msb').setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+$('menu-btn').onclick = openMenu;
+$('more-btn').onclick = openMenu;
+$('msb-x').onclick = closeMenu;
+$('sbd').onclick = closeMenu;
+addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+addEventListener('resize', () => { if (innerWidth > 920) closeMenu(); });
+$('msb').addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go){ setTab(go.dataset.go); closeMenu(); return; }
+  const act = e.target.closest('[data-act]');
+  if (act){
+    const a = act.dataset.act;
+    closeMenu();
+    if (a === 'edit') openEditor();
+    else if (a === 'addfriend'){ $('add-in').value=''; $('add-err').style.display='none'; open('add-m'); setTimeout(()=>$('add-in').focus(),120); }
+    else if (a === 'logout') $('logout').click();
+    return;
+  }
+  if (e.target.closest('a[href]')) closeMenu();
+});
+$('m-copy').onclick = async () => {
+  const id = meData?.zonoId; if (!id) return toast('ID not ready yet', true);
+  try { await navigator.clipboard.writeText(id); toast('Zono ID copied'); }
+  catch(e){ toast(id); }
+};
+
 /* ---------- games grid ---------- */
 $('games').innerHTML = GAMES.map(g => `
   <button class="tick ${g.soon?'soon':''}" style="--c:${g.c}" data-g="${g.id}" ${g.soon?'disabled':''}>
@@ -605,6 +734,11 @@ function updateHero(d){
   $('my-av').innerHTML = avatar(d, true);
   $('my-name').textContent = d.displayName || 'Player';
   $('my-rank').textContent = `${rank.name} · ${(d.xp||0).toLocaleString()} XP`;
+  // mobile sidebar menu
+  $('m-av').innerHTML = avatar(d);
+  $('m-name').textContent = d.displayName || 'Player';
+  $('m-rank').textContent = `${rank.name} · ${(d.xp||0).toLocaleString()} XP`;
+  $('m-zid').textContent = d.zonoId || 'ZONO-••••••';
 }
 
 /* ---------- auth ---------- */
@@ -643,7 +777,7 @@ function friendsListener(){
   let latestSnap = null;
   const q = query(collection(db,'friendships'), where('participants','array-contains',me.uid), where('status','==','accepted'));
   const render = async (snap) => {
-    $('f-count').textContent = snap.size; $('f-badge').textContent = snap.size;
+    $('f-count').textContent = snap.size; $('f-badge').textContent = snap.size; $('m-badge').textContent = snap.size;
     if (snap.empty){
       friends = [];
       $('friends').innerHTML = '<div style="color:var(--mut);font-size:.85rem;padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center">No friends yet. Tap Add.</div>';

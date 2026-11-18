@@ -1,1303 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S1N9CK48LE"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-S1N9CK48LE');
-    </script>
-    <meta name="google-site-verification" content="gcZ5xwhV_NYlNaTTvwk2fkbwGeeamVC1kFMCh4c-9RE" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta property="og:title" content="Zono Game">
-    <meta property="og:description" content="Play Zono online for free">
-    <meta property="og:image" content="https://byte-cell1.github.io/zono/favicon.png">
-    <meta property="og:url" content="https://byte-cell1.github.io/zono/">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="google-site-verification" content="xAC5LlUUX3H8_6P2JefNkOHPwalCM2T-i84eFnJDv8M" />
-    <title>Zono | Play. Compete. Connect.</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Gaming-style fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* =========================================
-           CSS VARIABLES & RESET
-           ========================================= */
-        :root {
-            --bg-dark: #050507;
-            --bg-panel: #0f0f13;
-            --bg-glass: rgba(15, 15, 19, 0.7);
-            --text-main: #ffffff;
-            --text-muted: #8b8b93;
-            
-            /* Zono Brand Colors */
-            --primary: #ccff00; 
-            --primary-hover: #b3e600;
-            --primary-glow: rgba(204, 255, 0, 0.4);
-            
-            /* Secondary Accent */
-            --accent-red: #ff3366;
-            
-            --font-heading: 'Orbitron', sans-serif;
-            --font-body: 'Rajdhani', sans-serif;
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--primary); 
-            border-radius: 4px;
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        a { text-decoration: none; color: inherit; cursor: none; }
-        ul { list-style: none; }
-        button, input { cursor: none; }
-
-        /* =========================================
-           CUSTOM NEON CURSOR
-           ========================================= */
-        .cursor-dot, .cursor-outline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .cursor-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .cursor-outline {
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--primary);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-        }
-
-        .cursor-outline.hover {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(204, 255, 0, 0.1);
-            border-color: transparent;
-        }
-
-        /* =========================================
-           TYPOGRAPHY & UTILITIES
-           ========================================= */
-        h1, h2, h3, h4 {
-            font-family: var(--font-heading);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1.1;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 5%;
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 16px 36px;
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            transition: var(--transition);
-            border: none;
-            position: relative;
-            overflow: hidden;
-            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px); 
-            z-index: 1;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.2);
-            transition: var(--transition);
-            z-index: -1;
-        }
-
-        .btn:hover::before { left: 0; }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: #000;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            box-shadow: 0 0 40px var(--primary-glow);
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .section-title {
-            font-size: 2.8rem;
-            margin-bottom: 3rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title span {
-            color: transparent;
-            -webkit-text-stroke: 1px var(--primary);
-            text-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        /* Scroll Reveal Animation Classes */
-        .reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* =========================================
-           NAVIGATION
-           ========================================= */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 25px 0;
-            transition: var(--transition);
-            border-bottom: 1px solid transparent;
-        }
-
-        header.scrolled {
-            background: rgba(5, 5, 7, 0.85);
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1001;
-        }
-
-        .logo i {
-            color: var(--primary);
-            filter: drop-shadow(0 0 8px var(--primary-glow));
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 40px;
-            font-family: var(--font-heading);
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        .nav-links a {
-            transition: var(--transition);
-            position: relative;
-            padding-bottom: 5px;
-        }
-
-        .nav-links a:hover { color: var(--primary); }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--primary);
-            transition: var(--transition);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .nav-links a:hover::after { width: 100%; }
-
-        .nav-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            z-index: 1001;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-
-        .menu-toggle:hover { color: var(--primary); }
-
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(5, 5, 7, 0.98);
-            backdrop-filter: blur(25px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition);
-        }
-
-        .mobile-menu.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .mobile-menu a {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-
-        .mobile-menu a:hover {
-            color: var(--primary);
-            letter-spacing: 3px;
-        }
-
-        /* =========================================
-           HERO SECTION
-           ========================================= */
-        .hero {
-            height: 100vh;
-            min-height: 800px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            background: 
-                linear-gradient(105deg, rgba(5,5,7,1) 40%, rgba(5,5,7,0.7) 70%, rgba(5,5,7,0.3) 100%),
-                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-            background-attachment: fixed;
-        }
-
-        /* Particle Network Canvas */
-        #particle-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 40%;
-            right: 10%;
-            width: 500px;
-            height: 500px;
-            background: var(--primary);
-            filter: blur(200px);
-            opacity: 0.12;
-            border-radius: 50%;
-            transform: translateY(-50%);
-            z-index: 0;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 750px;
-            margin-top: 50px;
-            will-change: transform; /* For Parallax */
-        }
-
-        .hero-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--primary);
-            font-family: var(--font-heading);
-            font-weight: 700;
-            letter-spacing: 5px;
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            animation: fadeUp 1s ease forwards;
-            opacity: 0;
-        }
-
-        .hero-tag::before {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 2px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .hero h1 {
-            font-size: 5.5rem;
-            margin-bottom: 30px;
-            text-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            animation: fadeUp 1s ease 0.2s forwards;
-            opacity: 0;
-        }
-
-        .hero h1 span {
-            color: transparent;
-            -webkit-text-stroke: 1px var(--primary);
-            text-shadow: 0 0 30px var(--primary-glow);
-            display: inline-block;
-            animation: glitch 3s infinite;
-        }
-
-        /* Glitch Effect */
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-        }
-
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            color: var(--text-muted);
-            margin-bottom: 45px;
-            max-width: 600px;
-            font-weight: 500;
-            animation: fadeUp 1s ease 0.4s forwards;
-            opacity: 0;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            animation: fadeUp 1s ease 0.6s forwards;
-            opacity: 0;
-        }
-
-        /* =========================================
-           FEATURES SECTION
-           ========================================= */
-        .features {
-            padding: 140px 0;
-            background-color: var(--bg-dark);
-            position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .feature-card {
-            background: linear-gradient(145deg, var(--bg-panel), #08080a);
-            padding: 50px 35px;
-            text-align: left;
-            border: 1px solid rgba(255,255,255,0.03);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-        }
-
-        .feature-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--primary);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: var(--transition);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(204, 255, 0, 0.3);
-            background: linear-gradient(145deg, #141418, #08080a);
-        }
-
-        .feature-card:hover::after { transform: scaleX(1); }
-
-        .feature-icon {
-            font-size: 2.2rem;
-            color: var(--primary);
-            margin-bottom: 30px;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(204, 255, 0, 0.05);
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover .feature-icon {
-            background: var(--primary);
-            color: #000;
-            transform: rotate(360deg) scale(1.1);
-            box-shadow: 0 0 30px var(--primary-glow);
-        }
-
-        .feature-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        /* =========================================
-           GAME CATALOGUE (3D TILT)
-           ========================================= */
-        .games-section {
-            padding: 140px 0;
-            background: radial-gradient(circle at top center, #0f0f13 0%, var(--bg-dark) 100%);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 60px;
-        }
-
-        .view-all {
-            color: var(--primary);
-            font-family: var(--font-heading);
-            font-size: 0.95rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: var(--transition);
-        }
-
-        .view-all:hover { gap: 20px; }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 40px;
-            perspective: 1000px; /* Required for 3D effect */
-        }
-
-        .game-card {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            aspect-ratio: 16/9;
-            background: #000;
-            border: 1px solid rgba(255,255,255,0.05);
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease; /* Fast transition for mouse tracking */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* The 3D inner container */
-        .game-card-inner {
-            position: absolute;
-            inset: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            transform: translateZ(20px); /* Pushes image forward in 3D space */
-        }
-
-        .game-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px var(--primary-glow);
-        }
-
-        .game-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.4s ease;
-            opacity: 0.7;
-        }
-
-        .game-card:hover .game-image { opacity: 1; }
-
-        .game-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(5,5,7,1) 0%, rgba(5,5,7,0.2) 60%, transparent 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 30px;
-            transform: translateZ(30px); /* Pushes text further forward */
-        }
-
-        .game-category {
-            color: var(--primary);
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            font-family: var(--font-heading);
-        }
-
-        .game-title {
-            font-size: 1.5rem;
-            color: white;
-            transition: var(--transition);
-        }
-
-        .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateZ(50px) scale(0.5);
-            width: 70px;
-            height: 70px;
-            background: var(--primary);
-            color: #000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            opacity: 0;
-            transition: var(--transition);
-            box-shadow: 0 0 30px var(--primary-glow);
-        }
-
-        .game-card:hover .play-icon {
-            transform: translate(-50%, -50%) translateZ(50px) scale(1);
-            opacity: 1;
-        }
-
-        /* =========================================
-           NEWSLETTER CTA
-           ========================================= */
-        .newsletter {
-            padding: 120px 0;
-            background-color: var(--bg-dark);
-        }
-
-        .newsletter-box {
-            background: linear-gradient(135deg, var(--primary) 0%, #99cc00 100%);
-            padding: 80px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 50px), calc(100% - 50px) 100%, 0 100%);
-        }
-
-        .newsletter-box::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 250px;
-            height: 250px;
-            border: 50px solid rgba(0,0,0,0.1);
-            border-radius: 50%;
-        }
-
-        .newsletter-box h2 {
-            color: #000;
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .newsletter-box p {
-            color: #222;
-            font-weight: 600;
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 1.2rem;
-        }
-
-        .newsletter-form {
-            display: flex;
-            max-width: 600px;
-            margin: 0 auto;
-            gap: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .newsletter-form input {
-            flex: 1;
-            padding: 20px 30px;
-            border: none;
-            background-color: #000;
-            color: white;
-            font-family: var(--font-body);
-            font-size: 1.1rem;
-            outline: none;
-        }
-
-        .newsletter-form input::placeholder { color: #666; }
-
-        .newsletter-form button {
-            padding: 20px 40px;
-            background-color: #1a1a1a;
-            color: var(--primary);
-            border: none;
-            font-family: var(--font-heading);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            border-left: 1px solid #333;
-        }
-
-        .newsletter-form button:hover {
-            background-color: #333;
-        }
-
-        /* =========================================
-           FOOTER
-           ========================================= */
-        footer {
-            background-color: #020203;
-            padding: 100px 0 40px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 80px;
-        }
-
-        .footer-brand p {
-            color: var(--text-muted);
-            margin-top: 25px;
-            max-width: 320px;
-            font-size: 1rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background-color: var(--bg-panel);
-            color: var(--text-main);
-            transition: var(--transition);
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-
-        .social-links a:hover {
-            background-color: var(--primary);
-            color: #000;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px var(--primary-glow);
-        }
-
-        .footer-column h4 {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: var(--text-main);
-        }
-
-        .footer-column ul {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .footer-column a {
-            color: var(--text-muted);
-            font-size: 1rem;
-            transition: var(--transition);
-            display: inline-block;
-        }
-
-        .footer-column a:hover {
-            color: var(--primary);
-            transform: translateX(8px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* =========================================
-           RESPONSIVE DESIGN
-           ========================================= */
-        @media (max-width: 1024px) {
-            .hero h1 { font-size: 4.5rem; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .cursor-dot, .cursor-outline { display: none; } /* Hide custom cursor on touch devices */
-            a, button, input { cursor: pointer; }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .nav-actions .btn-outline { display: none; }
-            .menu-toggle { display: block; }
-            
-            .hero { background-attachment: scroll; min-height: 700px; }
-            .hero h1 { font-size: 3rem; }
-            .hero-buttons { flex-direction: column; gap: 15px; }
-            .hero-buttons .btn { width: 100%; }
-            
-            .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .section-title { font-size: 2.2rem; }
-            
-            .newsletter-box { padding: 50px 20px; }
-            .newsletter-box h2 { font-size: 2.2rem; }
-            .newsletter-form { flex-direction: column; }
-            .newsletter-form button { padding: 20px; }
-            
-            .footer-grid { grid-template-columns: 1fr; gap: 40px; }
-            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
-        }
-    </style>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-S1N9CK48LE');
+</script>
+<meta name="google-site-verification" content="gcZ5xwhV_NYlNaTTvwk2fkbwGeeamVC1kFMCh4c-9RE" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta property="og:title" content="Zono Game">
+<meta property="og:description" content="Play Zono online for free">
+<meta property="og:image" content="https://byte-cell1.github.io/zono/favicon.png">
+<meta property="og:url" content="https://byte-cell1.github.io/zono/">
+<meta name="twitter:card" content="summary_large_image">
+<title>Zono | Play. Compete. Connect.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#050507;--panel:#0d1110;--text:#fff;--muted:#8b9390;--p:#ccff00;--ph:#b3e600;--glow:rgba(204,255,0,.4);--line:rgba(255,255,255,.07);--fh:'Orbitron',sans-serif;--fb:'Rajdhani',sans-serif;--t:all .4s cubic-bezier(.16,1,.3,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--p);border-radius:4px}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit;cursor:none}ul{list-style:none}button,input{cursor:none;font-family:inherit}
+:focus-visible{outline:2px solid var(--p);outline-offset:3px}
+.cursor-dot,.cursor-outline{position:fixed;top:0;left:0;transform:translate(-50%,-50%);border-radius:50%;z-index:9999;pointer-events:none}
+.cursor-dot{width:8px;height:8px;background:var(--p);box-shadow:0 0 10px var(--p)}
+.cursor-outline{width:40px;height:40px;border:2px solid var(--p);transition:width .2s,height .2s,background-color .2s}
+.cursor-outline.hover{width:60px;height:60px;background:rgba(204,255,0,.1);border-color:transparent}
+h1,h2,h3,h4{font-family:var(--fh);text-transform:uppercase;letter-spacing:1px;line-height:1.1}
+.container{max-width:1400px;margin:0 auto;padding:0 5%;position:relative;z-index:2}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 34px;font-family:var(--fh);font-weight:700;font-size:.85rem;text-transform:uppercase;transition:var(--t);border:none;position:relative;overflow:hidden;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);z-index:1}
+.btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:rgba(255,255,255,.22);transition:var(--t);z-index:-1}
+.btn:hover::before{left:0}
+.btn-primary{background:var(--p);color:#000;box-shadow:0 0 20px var(--glow)}
+.btn-primary:hover{box-shadow:0 0 40px var(--glow);transform:translateY(-3px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.2)}
+.btn-outline:hover{border-color:var(--p);color:var(--p);transform:translateY(-3px)}
+.title{font-size:2.6rem;margin-bottom:12px}
+.title span{color:transparent;-webkit-text-stroke:1px var(--p);text-shadow:0 0 20px var(--glow)}
+.sub{color:var(--muted);font-size:1.15rem;max-width:560px}
+.reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.5,0,0,1)}
+.reveal.active{opacity:1;transform:none}
+
+/* HEADER */
+header{position:fixed;top:0;width:100%;z-index:1000;padding:24px 0;transition:var(--t);border-bottom:1px solid transparent}
+header.scrolled{background:rgba(5,5,7,.85);padding:14px 0;border-bottom:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.nav-container{display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:var(--fh);font-size:1.7rem;font-weight:900;display:flex;align-items:center;gap:10px;z-index:1001}
+.logo i{color:var(--p);filter:drop-shadow(0 0 8px var(--glow))}
+.nav-links{display:flex;gap:38px;font-family:var(--fh);font-size:.8rem;font-weight:500;letter-spacing:1px}
+.nav-links a{position:relative;padding-bottom:5px;transition:var(--t)}
+.nav-links a:hover{color:var(--p)}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:var(--t);box-shadow:0 0 10px var(--glow)}
+.nav-links a:hover::after{width:100%}
+.nav-actions{display:flex;gap:14px;align-items:center}
+.nav-actions .btn{padding:12px 26px;font-size:.78rem}
+.menu-toggle{display:none;font-size:1.5rem;z-index:1001;background:none;border:none;color:var(--text)}
+.mobile-menu{position:fixed;inset:0;background:rgba(5,5,7,.98);backdrop-filter:blur(25px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:28px;z-index:1000;opacity:0;pointer-events:none;transition:var(--t)}
+.mobile-menu.active{opacity:1;pointer-events:all}
+.mobile-menu a{font-family:var(--fh);font-size:1.7rem;text-transform:uppercase}
+.mobile-menu a:hover{color:var(--p)}
+
+/* HERO */
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;padding:140px 0 90px;overflow:hidden;background:radial-gradient(ellipse at 75% 40%,rgba(204,255,0,.09),transparent 55%),var(--bg)}
+#particle-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;color:var(--p);font-family:var(--fh);font-weight:700;letter-spacing:4px;margin-bottom:22px;font-size:.8rem;text-transform:uppercase}
+.hero-tag::before{content:'';width:40px;height:2px;background:var(--p);box-shadow:0 0 10px var(--glow)}
+.hero h1{font-size:5rem;margin-bottom:26px;text-shadow:0 10px 40px rgba(0,0,0,.8)}
+.hero h1 span{color:transparent;-webkit-text-stroke:1px var(--p);text-shadow:0 0 30px var(--glow);display:inline-block;animation:glitch 4s infinite}
+@keyframes glitch{0%,90%,100%{transform:none}92%{transform:translate(-3px,2px)}94%{transform:translate(3px,-2px)}96%{transform:translate(-2px,-2px)}}
+.hero p{font-size:1.25rem;color:var(--muted);margin-bottom:38px;max-width:560px;font-weight:500}
+.hero-buttons{display:flex;gap:18px;flex-wrap:wrap}
+.stats{display:flex;gap:44px;margin-top:54px;flex-wrap:wrap}
+.stat b{display:block;font-family:var(--fh);font-size:1.9rem;color:var(--p);text-shadow:0 0 18px var(--glow)}
+.stat span{color:var(--muted);font-size:.95rem}
+.portal-wrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:460px}
+.portal{position:relative;width:min(420px,80vw);aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-18px)}}
+.portal .ring{position:absolute;border-radius:50%;border:2px solid var(--p)}
+.r1{inset:0;box-shadow:0 0 60px var(--glow),inset 0 0 60px var(--glow);border-style:solid;animation:spin 18s linear infinite}
+.r2{inset:9%;border:2px dashed rgba(204,255,0,.55);animation:spin 12s linear infinite reverse}
+.r3{inset:18%;border-width:6px;filter:blur(1px);box-shadow:0 0 40px var(--p),inset 0 0 40px var(--p)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.core{position:absolute;inset:26%;border-radius:50%;background:radial-gradient(circle,#000 25%,rgba(204,255,0,.5) 70%,transparent 72%);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.8}}
+.portal i{position:relative;font-size:3.6rem;color:var(--p);filter:drop-shadow(0 0 20px var(--p));z-index:2}
+.chip{position:absolute;background:var(--panel);border:1px solid rgba(204,255,0,.25);padding:10px 16px;font-family:var(--fh);font-size:.7rem;display:flex;align-items:center;gap:8px;backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.chip i{font-size:.9rem;color:var(--p);filter:none}
+.chip.c1{top:8%;left:0}.chip.c2{bottom:12%;right:0}.chip.c3{bottom:2%;left:6%}
+.live{width:8px;height:8px;border-radius:50%;background:var(--p);box-shadow:0 0 10px var(--p);animation:pulse 1.5s infinite}
+
+/* MARQUEE */
+.marquee{border-block:1px solid var(--line);background:var(--panel);overflow:hidden;padding:16px 0}
+.track{display:flex;gap:60px;width:max-content;animation:scroll 30s linear infinite;font-family:var(--fh);font-size:.9rem;color:var(--muted);white-space:nowrap}
+.track span i{color:var(--p);margin-right:12px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{position:relative}
+.pad{padding:120px 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:50px;gap:20px;flex-wrap:wrap}
+.view-all{color:var(--p);font-family:var(--fh);font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:10px;transition:var(--t)}
+.view-all:hover{gap:20px}
+
+/* TOP PICKS */
+.picks{display:flex;gap:24px;overflow-x:auto;padding:6px 5% 24px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--p) transparent}
+.pick{flex:0 0 min(520px,86vw);scroll-snap-align:start;display:flex;gap:22px;background:linear-gradient(145deg,#111816,#08090a);border:1px solid var(--line);border-radius:8px;padding:18px;transition:var(--t)}
+.pick:hover{border-color:rgba(204,255,0,.4);transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.5),0 0 30px rgba(204,255,0,.08)}
+.pick img{width:170px;height:200px;object-fit:cover;border-radius:6px;flex-shrink:0}
+.pick h3{font-size:1.1rem;margin-bottom:10px}
+.pick p{color:var(--muted);font-size:1rem;margin-bottom:14px}
+.meta{display:flex;gap:16px;font-size:.9rem;color:var(--muted);margin-bottom:14px}
+.meta i{color:var(--p);margin-right:5px}
+.pick .go{color:var(--p);font-family:var(--fh);font-size:.78rem;font-weight:700}
+
+/* LATEST GAMES */
+.games-section{background:radial-gradient(circle at top center,#101614 0%,var(--bg) 100%)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+.filter{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--text);padding:9px 22px;font-family:var(--fh);font-size:.75rem;font-weight:700;text-transform:uppercase;transition:var(--t)}
+.filter:hover{border-color:var(--p);color:var(--p)}
+.filter.on{background:var(--p);color:#000;border-color:var(--p);box-shadow:0 0 18px var(--glow)}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;perspective:1000px}
+.game-card{position:relative;border-radius:8px;aspect-ratio:16/10;background:#000;border:1px solid var(--line);transform-style:preserve-3d;transition:transform .1s ease,border-color .3s,box-shadow .3s;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.game-card.hide{display:none}
+.game-card:hover{border-color:var(--p);box-shadow:0 20px 50px rgba(0,0,0,.8),0 0 30px var(--glow)}
+.game-inner{position:absolute;inset:0;border-radius:8px;overflow:hidden;transform:translateZ(20px)}
+.game-image{width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .4s,transform .6s}
+.game-card:hover .game-image{opacity:1;transform:scale(1.06)}
+.game-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,5,7,1) 0%,rgba(5,5,7,.2) 60%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:26px}
+.game-category{color:var(--p);font-size:.75rem;font-weight:700;letter-spacing:3px;margin-bottom:8px;font-family:var(--fh);text-transform:uppercase}
+.game-title{font-size:1.4rem}
+.badge{position:absolute;top:16px;right:16px;background:var(--p);color:#000;font-family:var(--fh);font-size:.65rem;font-weight:700;padding:5px 12px;z-index:2}
+.play-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);width:66px;height:66px;background:var(--p);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;opacity:0;transition:var(--t);box-shadow:0 0 30px var(--glow);z-index:2}
+.game-card:hover .play-icon{transform:translate(-50%,-50%) scale(1);opacity:1}
+.center{text-align:center;margin-top:56px}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.feature-card{background:linear-gradient(145deg,var(--panel),#08080a);padding:44px 30px;border:1px solid var(--line);border-radius:8px;transition:var(--t);position:relative;overflow:hidden}
+.feature-card::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:var(--p);transform:scaleX(0);transform-origin:left;transition:var(--t);box-shadow:0 0 20px var(--glow)}
+.feature-card:hover{transform:translateY(-10px);border-color:rgba(204,255,0,.3)}
+.feature-card:hover::after{transform:scaleX(1)}
+.feature-icon{font-size:2rem;color:var(--p);margin-bottom:26px;width:66px;height:66px;display:flex;align-items:center;justify-content:center;background:rgba(204,255,0,.06);border-radius:50%;transition:var(--t)}
+.feature-card:hover .feature-icon{background:var(--p);color:#000;transform:rotate(360deg) scale(1.1);box-shadow:0 0 30px var(--glow)}
+.feature-card h3{font-size:1.3rem;margin-bottom:12px}
+.feature-card p{color:var(--muted);font-weight:500}
+
+/* SPOTLIGHT */
+.spot{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.stack{position:relative;height:480px}
+.stack img{position:absolute;object-fit:cover;border-radius:8px;border:1px solid rgba(204,255,0,.25);box-shadow:0 20px 50px rgba(0,0,0,.7);transition:var(--t)}
+.stack .s1{width:50%;height:56%;top:0;left:0;transform:rotate(-4deg)}
+.stack .s2{width:58%;height:68%;bottom:0;right:4%;transform:rotate(3deg);box-shadow:0 20px 50px rgba(0,0,0,.7),0 0 50px rgba(204,255,0,.15)}
+.stack:hover .s1{transform:rotate(-7deg) translate(-12px,-8px)}
+.stack:hover .s2{transform:rotate(6deg) translate(12px,8px)}
+.spot h2{font-size:2.6rem;margin-bottom:18px}
+.spot p{color:var(--muted);font-size:1.15rem;margin-bottom:30px;max-width:520px}
+.ticks{display:grid;gap:12px;margin-bottom:36px}
+.ticks li{display:flex;gap:12px;align-items:center;font-weight:600}
+.ticks i{color:var(--p)}
+
+/* NEWSLETTER */
+.newsletter{padding:100px 0}
+.newsletter-box{background:linear-gradient(135deg,var(--p) 0%,#99cc00 100%);padding:70px 40px;text-align:center;position:relative;overflow:hidden;max-width:960px;margin:0 auto;clip-path:polygon(0 0,100% 0,100% calc(100% - 46px),calc(100% - 46px) 100%,0 100%)}
+.newsletter-box::before{content:'';position:absolute;top:-50px;right:-50px;width:240px;height:240px;border:46px solid rgba(0,0,0,.1);border-radius:50%}
+.newsletter-box h2{color:#000;font-size:2.8rem;margin-bottom:14px}
+.newsletter-box p{color:#1c1c1c;font-weight:600;margin:0 auto 34px;max-width:560px;font-size:1.15rem}
+.newsletter-form{display:flex;max-width:580px;margin:0 auto;position:relative;z-index:1}
+.newsletter-form input{flex:1;min-width:0;padding:18px 26px;border:none;background:#000;color:#fff;font-size:1.05rem;outline:none}
+.newsletter-form input::placeholder{color:#777}
+.newsletter-form button{padding:18px 34px;background:#1a1a1a;color:var(--p);border:none;font-family:var(--fh);font-weight:700;transition:var(--t);border-left:1px solid #333}
+.newsletter-form button:hover{background:#333}
+#nl-msg{margin-top:16px;color:#000;font-weight:700;min-height:1.6em}
+
+/* FOOTER */
+footer{background:#020203;padding:90px 0 36px;border-top:1px solid var(--line)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;margin-bottom:70px}
+.footer-brand p{color:var(--muted);margin-top:22px;max-width:320px}
+.social-links{display:flex;gap:14px;margin-top:28px}
+.social-links a{display:flex;align-items:center;justify-content:center;width:48px;height:48px;background:var(--panel);transition:var(--t);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.social-links a:hover{background:var(--p);color:#000;transform:translateY(-5px)}
+.footer-column h4{font-size:1rem;margin-bottom:26px}
+.footer-column ul{display:flex;flex-direction:column;gap:16px}
+.footer-column a{color:var(--muted);transition:var(--t);display:inline-block}
+.footer-column a:hover{color:var(--p);transform:translateX(8px)}
+.footer-bottom{border-top:1px solid var(--line);padding-top:36px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.9rem;gap:10px;flex-wrap:wrap}
+
+@media(max-width:1024px){
+.cursor-dot,.cursor-outline{display:none}a,button,input{cursor:pointer}
+.hero h1{font-size:4rem}.hero-grid,.spot{grid-template-columns:1fr}
+.portal-wrap{min-height:400px}.footer-grid{grid-template-columns:1fr 1fr}
+.stack{height:420px;max-width:520px}}
+@media(max-width:768px){
+.nav-links,.nav-actions .btn-outline{display:none}.menu-toggle{display:block}
+.hero{padding-top:120px}.hero h1{font-size:2.8rem}.hero-buttons .btn{width:100%}
+.title,.spot h2{font-size:2rem}.pad{padding:80px 0}
+.pick{flex-direction:column}.pick img{width:100%;height:190px}
+.newsletter-box{padding:50px 20px}.newsletter-box h2{font-size:2rem}
+.newsletter-form{flex-direction:column}.footer-grid{grid-template-columns:1fr;gap:38px}
+.footer-bottom{flex-direction:column;text-align:center}.chip{display:none}}
+
+/* PROGRESS + TOP */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--p);box-shadow:0 0 12px var(--p);z-index:2000}
+#totop{position:fixed;right:24px;bottom:24px;width:50px;height:50px;background:var(--p);color:#000;border:none;border-radius:50%;font-size:1.1rem;z-index:900;opacity:0;pointer-events:none;transform:translateY(20px);transition:var(--t);box-shadow:0 0 24px var(--glow)}
+#totop.show{opacity:1;pointer-events:all;transform:none}
+/* COUNTDOWN */
+.countdown{background:linear-gradient(90deg,rgba(204,255,0,.1),rgba(204,255,0,.02));border-bottom:1px solid rgba(204,255,0,.2)}
+.cd-in{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 0;flex-wrap:wrap}
+.cd-in h3{font-size:1.25rem;display:flex;align-items:center;gap:12px}
+.cd-in p{color:var(--muted)}
+.timer{display:flex;gap:12px}
+.timer div{background:#000;border:1px solid rgba(204,255,0,.3);min-width:76px;padding:10px 14px;text-align:center}
+.timer b{display:block;font-family:var(--fh);font-size:1.7rem;color:var(--p);text-shadow:0 0 14px var(--glow)}
+.timer span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px}
+/* SEARCH */
+.tools{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:36px}
+.tools .filters{margin:0}
+.search{position:relative;flex:0 1 300px;width:100%}
+.search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--p)}
+.search input{width:100%;padding:12px 16px 12px 44px;background:var(--panel);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:1rem;outline:none;transition:var(--t)}
+.search input:focus{border-color:var(--p);box-shadow:0 0 18px rgba(204,255,0,.15)}
+#empty{display:none;text-align:center;color:var(--muted);padding:40px 0;font-size:1.15rem}
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:s;position:relative}
+.step{padding:34px 28px;border:1px solid var(--line);border-radius:8px;background:var(--panel);position:relative;transition:var(--t)}
+.step:hover{border-color:rgba(204,255,0,.35);transform:translateY(-6px)}
+.step::before{counter-increment:s;content:counter(s);font-family:var(--fh);font-weight:900;font-size:3.4rem;color:transparent;-webkit-text-stroke:1px var(--p);position:absolute;top:14px;right:22px;opacity:.5}
+.step h3{font-size:1.2rem;margin-bottom:10px}
+.step p{color:var(--muted)}
+/* FAQ */
+.faq{max-width:860px;margin:0 auto}
+.faq details{border:1px solid var(--line);background:var(--panel);margin-bottom:14px;border-radius:6px;transition:var(--t)}
+.faq details[open]{border-color:rgba(204,255,0,.4)}
+.faq summary{list-style:none;padding:22px 26px;font-family:var(--fh);font-size:.95rem;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';color:var(--p);font-size:1.6rem;transition:var(--t)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 26px 24px;color:var(--muted);font-size:1.1rem}
+@media(max-width:1024px){.faq summary{cursor:pointer}}
+@media(max-width:768px){.steps{grid-template-columns:1fr}.cd-in{justify-content:center;text-align:center}.timer div{min-width:64px}.search{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+</style>
 </head>
 <body>
 
-    <!-- CUSTOM CURSOR -->
-    <div class="cursor-dot" id="cursor-dot"></div>
-    <div class="cursor-outline" id="cursor-outline"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-outline" id="cursor-outline"></div>
+<div id="progress"></div>
 
-    <!-- HEADER -->
-    <header id="header">
-        <div class="container nav-container">
-            <a href="#" class="logo">
-                <i class="fa-solid fa-gamepad"></i> ZONO
-            </a>
-            
-            <ul class="nav-links">
-                <li><a href="#">Games</a></li>
-                <li><a href="#">Leaderboards</a></li>
-                <li><a href="#">Tournaments</a></li>
-                <li><a href="#">Community</a></li>
-            </ul>
-
-            <div class="nav-actions">
-                <a href="login.html" class="btn btn-outline">Login</a>
-                <a href="signup.html" class="btn btn-primary">Sign Up</a>
-                <div class="menu-toggle" id="menu-toggle">
-                    <i class="fa-solid fa-bars"></i>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- MOBILE MENU OVERLAY -->
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="#">Games</a>
-        <a href="#">Leaderboards</a>
-        <a href="#">Tournaments</a>
-        <a href="#">Community</a>
-        <a href="signup.html" class="btn btn-primary" style="margin-top: 20px;">Sign Up Free</a>
+<header id="header">
+  <div class="container nav-container">
+    <a href="#" class="logo"><i class="fa-solid fa-gamepad"></i> ZONO</a>
+    <ul class="nav-links">
+      <li><a href="#games">Games</a></li>
+      <li><a href="#">Leaderboards</a></li>
+      <li><a href="#">Tournaments</a></li>
+      <li><a href="#">Community</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-outline">Login</a>
+      <a href="signup.html" class="btn btn-primary">Sign Up</a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
     </div>
+  </div>
+</header>
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <canvas id="particle-canvas"></canvas>
-        
-        <div class="container">
-            <div class="hero-content" id="hero-content">
-                <span class="hero-tag">Season 1 is Live</span>
-                <h1>Play. Compete.<br><span>Connect.</span></h1>
-                <p>Welcome to Zono. The ultimate browser-based gaming ecosystem. Discover new games, challenge your friends, climb the global leaderboards, and build your gaming legacy.</p>
-                <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Play Free Now <i class="fa-solid fa-arrow-right"></i></a>
-                    <a href="#" class="btn btn-outline"><i class="fa-solid fa-play"></i> Watch Trailer</a>
-                </div>
-            </div>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#games">Games</a>
+  <a href="#">Leaderboards</a>
+  <a href="#">Tournaments</a>
+  <a href="#">Community</a>
+  <a href="login.html">Login</a>
+  <a href="signup.html" class="btn btn-primary" style="margin-top:20px">Sign Up Free</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="particle-canvas"></canvas>
+  <div class="container hero-grid">
+    <div id="hero-content">
+      <span class="hero-tag">Season 1 is Live</span>
+      <h1>Play. Compete.<br><span>Connect.</span></h1>
+      <p>Welcome to Zono. The ultimate browser-based gaming ecosystem. Discover new games, challenge your friends, climb the global leaderboards, and build your gaming legacy.</p>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn btn-primary">Play Free Now <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#games" class="btn btn-outline"><i class="fa-solid fa-compass"></i> Explore Games</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b data-count="50">0</b><span>HTML5 games</span></div>
+        <div class="stat"><b data-count="12">0</b><span>Daily tournaments</span></div>
+        <div class="stat"><b>Free</b><span>No download needed</span></div>
+      </div>
+    </div>
+    <div class="portal-wrap" aria-hidden="true">
+      <div class="portal">
+        <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+        <div class="core"></div><i class="fa-solid fa-gamepad"></i>
+      </div>
+      <div class="chip c1"><span class="live"></span> Players online</div>
+      <div class="chip c2"><i class="fa-solid fa-trophy"></i> Daily tournament</div>
+      <div class="chip c3"><i class="fa-solid fa-bolt"></i> Instant matchmaking</div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track" id="track">
+    <span><i class="fa-solid fa-chess-knight"></i>Zono Chess</span>
+    <span><i class="fa-solid fa-dice"></i>Ludo Classic</span>
+    <span><i class="fa-solid fa-snake"></i>Neon Snake</span>
+    <span><i class="fa-solid fa-table-cells"></i>Sudoku Master</span>
+    <span><i class="fa-solid fa-trophy"></i>Daily Tournaments</span>
+    <span><i class="fa-solid fa-users"></i>Online Multiplayer</span>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown">
+  <div class="container cd-in">
+    <div><h3><span class="live"></span> Next daily tournament</h3><p>Sign up before the clock hits zero to get a seat.</p></div>
+    <div class="timer" role="timer" aria-live="off"><div><b id="cd-h">00</b><span>Hours</span></div><div><b id="cd-m">00</b><span>Min</span></div><div><b id="cd-s">00</b><span>Sec</span></div></div>
+    <a href="signup.html" class="btn btn-primary">Join Free</a>
+  </div>
+</div>
+
+<!-- TOP PICKS -->
+<section class="pad">
+  <div class="container">
+    <div class="head reveal">
+      <div><h2 class="title">Top <span>Picks</span></h2><p class="sub">The games Zono players are queueing for right now.</p></div>
+      <a href="#games" class="view-all">Browse all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </div>
+  <div class="picks reveal">
+    <a href="#" class="pick"><img src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?q=80&w=600&auto=format&fit=crop" alt="Zono Chess" loading="lazy"><div><h3>Zono Chess</h3><p>Ranked 1v1 matches with private room codes and a global rating ladder.</p><div class="meta"><span><i class="fa-solid fa-user-group"></i>1v1</span><span><i class="fa-solid fa-star"></i>Ranked</span></div><span class="go">Play now</span></div></a>
+    <a href="#" class="pick"><img src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?q=80&w=600&auto=format&fit=crop" alt="Ludo Classic" loading="lazy"><div><h3>Ludo Classic</h3><p>Roll, race and capture. Invite up to three friends with a room code.</p><div class="meta"><span><i class="fa-solid fa-user-group"></i>2–4 players</span><span><i class="fa-solid fa-fire"></i>Popular</span></div><span class="go">Play now</span></div></a>
+    <a href="#" class="pick"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop" alt="Neon Snake" loading="lazy"><div><h3>Neon Snake</h3><p>Fast arcade survival. Grow longer, outlast rivals and top the weekly board.</p><div class="meta"><span><i class="fa-solid fa-user-group"></i>Solo + online</span><span><i class="fa-solid fa-bolt"></i>Arcade</span></div><span class="go">Play now</span></div></a>
+    <a href="#" class="pick"><img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600&auto=format&fit=crop" alt="Sudoku Master" loading="lazy"><div><h3>Sudoku Master</h3><p>Four difficulty levels and timed duels against friends.</p><div class="meta"><span><i class="fa-solid fa-user-group"></i>Solo + duel</span><span><i class="fa-solid fa-brain"></i>Puzzle</span></div><span class="go">Play now</span></div></a>
+  </div>
+</section>
+
+<!-- LATEST GAMES -->
+<section class="games-section pad" id="games">
+  <div class="container">
+    <div class="head reveal">
+      <div><h2 class="title">Latest <span>Games</span></h2><p class="sub">Fresh drops, always free and playable right in your browser.</p></div>
+      <a href="#" class="view-all">View All Games <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="tools reveal">
+      <div class="filters" id="filters">
+        <button class="filter on" data-f="all">All</button>
+        <button class="filter" data-f="board">Board</button>
+        <button class="filter" data-f="arcade">Arcade</button>
+        <button class="filter" data-f="puzzle">Puzzle</button>
+      </div>
+      <label class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="search" placeholder="Search games" aria-label="Search games"></label>
+    </div>
+    <div class="games-grid">
+      <div class="game-card reveal tilt-card" data-c="board"><div class="game-inner"><span class="badge">HOT</span><img src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?q=80&w=1000&auto=format&fit=crop" alt="Chess" class="game-image" loading="lazy"><div class="play-icon"><i class="fa-solid fa-play"></i></div><div class="game-overlay"><span class="game-category">Board Game</span><h3 class="game-title">Zono Chess</h3></div></div></div>
+      <div class="game-card reveal tilt-card" data-c="board"><div class="game-inner"><img src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?q=80&w=1000&auto=format&fit=crop" alt="Ludo" class="game-image" loading="lazy"><div class="play-icon"><i class="fa-solid fa-play"></i></div><div class="game-overlay"><span class="game-category">Board Game</span><h3 class="game-title">Ludo Classic</h3></div></div></div>
+      <div class="game-card reveal tilt-card" data-c="arcade"><div class="game-inner"><span class="badge">NEW</span><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop" alt="Snake" class="game-image" loading="lazy"><div class="play-icon"><i class="fa-solid fa-play"></i></div><div class="game-overlay"><span class="game-category">Arcade</span><h3 class="game-title">Neon Snake</h3></div></div></div>
+      <div class="game-card reveal tilt-card" data-c="puzzle"><div class="game-inner"><img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=1000&auto=format&fit=crop" alt="Sudoku" class="game-image" loading="lazy"><div class="play-icon"><i class="fa-solid fa-play"></i></div><div class="game-overlay"><span class="game-category">Puzzle</span><h3 class="game-title">Sudoku Master</h3></div></div></div>
+    </div>
+    <p id="empty">No games match that search. Try another name or category.</p>
+    <div class="center"><a href="signup.html" class="btn btn-primary">Get Started</a></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="pad">
+  <div class="container">
+    <h2 class="title reveal">Why <span>Zono?</span></h2>
+    <p class="sub reveal" style="margin-bottom:46px">Everything you need to play, win and meet other players in one place.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal"><div class="feature-icon"><i class="fa-solid fa-layer-group"></i></div><h3>Discover</h3><p>Play a massive collection of HTML5 games. From Chess and Ludo to Arcade Shooters and Puzzle games, all in one place.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.1s"><div class="feature-icon"><i class="fa-solid fa-users"></i></div><h3>Compete</h3><p>Challenge friends with private room codes or jump into matchmaking. Every game features online multiplayer.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.2s"><div class="feature-icon"><i class="fa-solid fa-trophy"></i></div><h3>Progress</h3><p>Earn XP, unlock achievements, and climb the global rankings. Your Zono profile tracks your journey.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.3s"><div class="feature-icon"><i class="fa-solid fa-globe"></i></div><h3>Connect</h3><p>Join a thriving community. Make new friends, chat, and participate in daily and weekly tournaments.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPOTLIGHT -->
+<section class="pad" style="padding-top:20px">
+  <div class="container spot">
+    <div class="stack reveal">
+      <img class="s1" src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?q=80&w=700&auto=format&fit=crop" alt="" loading="lazy">
+      <img class="s2" src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?q=80&w=700&auto=format&fit=crop" alt="" loading="lazy">
+    </div>
+    <div class="reveal">
+      <h2>Your next <span style="color:var(--p)">match</span> is one click away</h2>
+      <p>Create a free account, pick a game and challenge a friend with a room code, or let matchmaking find you a rival.</p>
+      <ul class="ticks">
+        <li><i class="fa-solid fa-circle-check"></i> Free to play, no downloads</li>
+        <li><i class="fa-solid fa-circle-check"></i> Earn XP and climb global rankings</li>
+        <li><i class="fa-solid fa-circle-check"></i> Daily and weekly tournaments</li>
+      </ul>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn btn-primary">Get Started</a>
+        <a href="#games" class="btn btn-outline"><i class="fa-solid fa-play"></i> Explore</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="pad" style="padding-top:40px">
+  <div class="container">
+    <h2 class="title reveal">Start in <span>3 steps</span></h2>
+    <p class="sub reveal" style="margin-bottom:46px">From sign up to your first win takes about a minute.</p>
+    <div class="steps">
+      <div class="step reveal"><h3>Create your account</h3><p>Sign up free with your email. Your profile starts tracking XP right away.</p></div>
+      <div class="step reveal" style="transition-delay:.1s"><h3>Pick a game</h3><p>Play solo, jump into matchmaking, or open a private room and share the code.</p></div>
+      <div class="step reveal" style="transition-delay:.2s"><h3>Climb the ranks</h3><p>Win matches, unlock achievements and enter daily tournaments to move up the leaderboard.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="pad" style="padding-top:20px">
+  <div class="container">
+    <h2 class="title reveal" style="text-align:center">Quick <span>answers</span></h2>
+    <div class="faq reveal" style="margin-top:40px">
+      <details><summary>Is Zono really free?</summary><p>Yes. You can play every game in your browser without paying or downloading anything.</p></details>
+      <details><summary>How do I play with friends?</summary><p>Create a private room, copy the room code and send it to your friend. They enter the code and you start playing.</p></details>
+      <details><summary>Do I need an account?</summary><p>An account saves your XP, achievements and leaderboard rank, and lets you enter tournaments.</p></details>
+      <details><summary>Does it work on my phone?</summary><p>Zono runs in any modern mobile or desktop browser, so there is nothing to install.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+  <div class="container">
+    <div class="newsletter-box reveal">
+      <h2>Join The Arena</h2>
+      <p>Subscribe to our newsletter for early access to new games, exclusive tournament invites, and platform updates.</p>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="Enter your email address" aria-label="Email address" required>
+        <button type="submit">Subscribe</button>
+      </form>
+      <div id="nl-msg" role="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo"><i class="fa-solid fa-gamepad"></i> ZONO</a>
+        <p>The all-in-one gaming platform. Play, compete, connect, and discover your next favorite game right in your browser.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
         </div>
-    </section>
+      </div>
+      <div class="footer-column"><h4>Platform</h4><ul><li><a href="#games">Games</a></li><li><a href="#">Leaderboards</a></li><li><a href="#">Tournaments</a></li><li><a href="#">Achievements</a></li></ul></div>
+      <div class="footer-column"><h4>Support</h4><ul><li><a href="#">Help Center</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Contact Us</a></li></ul></div>
+      <div class="footer-column"><h4>Community</h4><ul><li><a href="#">Forums</a></li><li><a href="#">Discord Server</a></li><li><a href="#">Creator Program</a></li><li><a href="#">Report a Bug</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Zono Gaming. All rights reserved.</p>
+      <p>Built for gamers, by gamers.</p>
+    </div>
+  </div>
+</footer>
 
-    <!-- FEATURES SECTION -->
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title reveal">Why <span>Zono?</span></h2>
-            <div class="features-grid">
-                
-                <div class="feature-card reveal">
-                    <div class="feature-icon"><i class="fa-solid fa-layer-group"></i></div>
-                    <h3>Discover</h3>
-                    <p>Play a massive collection of HTML5 games. From Chess and Ludo to Arcade Shooters and Puzzle games, all in one place.</p>
-                </div>
-                
-                <div class="feature-card reveal" style="transition-delay: 0.1s;">
-                    <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
-                    <h3>Compete</h3>
-                    <p>Challenge friends with private room codes or jump into matchmaking. Every game features online multiplayer.</p>
-                </div>
-                
-                <div class="feature-card reveal" style="transition-delay: 0.2s;">
-                    <div class="feature-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <h3>Progress</h3>
-                    <p>Earn XP, unlock achievements, and climb the global rankings. Your Zono profile tracks your journey.</p>
-                </div>
-                
-                <div class="feature-card reveal" style="transition-delay: 0.3s;">
-                    <div class="feature-icon"><i class="fa-solid fa-globe"></i></div>
-                    <h3>Connect</h3>
-                    <p>Join a thriving community. Make new friends, chat, and participate in daily and weekly tournaments.</p>
-                </div>
+<button id="totop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
 
-            </div>
-        </div>
-    </section>
+<script>
+// Header scroll
+const header=document.getElementById('header');
+window.addEventListener('scroll',()=>header.classList.toggle('scrolled',window.scrollY>50));
 
-    <!-- GAMES SECTION -->
-    <section class="games-section">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2 class="section-title">Featured <span>Games</span></h2>
-                <a href="#" class="view-all">View All Games <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            
-            <div class="games-grid">
-                <!-- Game 1 -->
-                <div class="game-card reveal tilt-card">
-                    <div class="game-card-inner">
-                        <img src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?q=80&w=1000&auto=format&fit=crop" alt="Chess" class="game-image">
-                        <div class="play-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="game-overlay">
-                            <span class="game-category">Board Game</span>
-                            <h3 class="game-title">Zono Chess</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Game 2 -->
-                <div class="game-card reveal tilt-card" style="transition-delay: 0.1s;">
-                    <div class="game-card-inner">
-                        <img src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?q=80&w=1000&auto=format&fit=crop" alt="Ludo" class="game-image">
-                        <div class="play-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="game-overlay">
-                            <span class="game-category">Board Game</span>
-                            <h3 class="game-title">Ludo Classic</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Game 3 -->
-                <div class="game-card reveal tilt-card" style="transition-delay: 0.2s;">
-                    <div class="game-card-inner">
-                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop" alt="Snake" class="game-image">
-                        <div class="play-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="game-overlay">
-                            <span class="game-category">Arcade</span>
-                            <h3 class="game-title">Neon Snake</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Game 4 -->
-                <div class="game-card reveal tilt-card" style="transition-delay: 0.3s;">
-                    <div class="game-card-inner">
-                        <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=1000&auto=format&fit=crop" alt="Sudoku" class="game-image">
-                        <div class="play-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="game-overlay">
-                            <span class="game-category">Puzzle</span>
-                            <h3 class="game-title">Sudoku Master</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+// Mobile menu
+const menuToggle=document.getElementById('menu-toggle'),mobileMenu=document.getElementById('mobile-menu'),menuIcon=menuToggle.querySelector('i');
+function setMenu(open){mobileMenu.classList.toggle('active',open);menuIcon.className=open?'fa-solid fa-xmark':'fa-solid fa-bars'}
+menuToggle.addEventListener('click',()=>setMenu(!mobileMenu.classList.contains('active')));
+mobileMenu.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>setMenu(false)));
 
-    <!-- NEWSLETTER CTA -->
-    <section class="newsletter">
-        <div class="container">
-            <div class="newsletter-box reveal">
-                <h2>Join The Arena</h2>
-                <p>Subscribe to our newsletter for early access to new games, exclusive tournament invites, and platform updates.</p>
-                <form class="newsletter-form" id="newsletterForm">
-                    <input type="email" placeholder="Enter your email address" required>
-                    <button type="submit">Subscribe</button>
-                </form>
-            </div>
-        </div>
-    </section>
+// Cursor
+const dot=document.getElementById('cursor-dot'),out=document.getElementById('cursor-outline');
+let mx=0,my=0,ox=0,oy=0;
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.transform=`translate(${mx}px,${my}px)`});
+(function loop(){ox+=(mx-ox)*.15;oy+=(my-oy)*.15;out.style.transform=`translate(${ox}px,${oy}px)`;requestAnimationFrame(loop)})();
+document.querySelectorAll('a,button,input,.game-card,.feature-card,.pick').forEach(el=>{
+  el.addEventListener('mouseenter',()=>out.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>out.classList.remove('hover'));
+});
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand reveal">
-                    <a href="#" class="logo"><i class="fa-solid fa-gamepad"></i> ZONO</a>
-                    <p>The all-in-one gaming platform. Play, compete, connect, and discover your next favorite game right in your browser.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#"><i class="fa-brands fa-discord"></i></a>
-                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-column reveal" style="transition-delay: 0.1s;">
-                    <h4>Platform</h4>
-                    <ul>
-                        <li><a href="#">Games</a></li>
-                        <li><a href="#">Leaderboards</a></li>
-                        <li><a href="#">Tournaments</a></li>
-                        <li><a href="#">Achievements</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column reveal" style="transition-delay: 0.2s;">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column reveal" style="transition-delay: 0.3s;">
-                    <h4>Community</h4>
-                    <ul>
-                        <li><a href="#">Forums</a></li>
-                        <li><a href="#">Discord Server</a></li>
-                        <li><a href="#">Creator Program</a></li>
-                        <li><a href="#">Report a Bug</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Zono Gaming. All rights reserved.</p>
-                <p>Built for gamers, by gamers.</p>
-            </div>
-        </div>
-    </footer>
+// Scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-    <!-- JAVASCRIPT -->
-    <script>
-        // 1. Header Scroll Effect
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+// Counters
+const cio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target,end=+el.dataset.count;let n=0;
+  const t=setInterval(()=>{n+=Math.max(1,Math.ceil(end/30));if(n>=end){n=end;clearInterval(t)}el.textContent=n+'+'},40);
+  cio.unobserve(el);
+}),{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
 
-        // 2. Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuIcon = menuToggle.querySelector('i');
+// Hero parallax
+const hero=document.getElementById('hero-content');
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY;
+  if(s<window.innerHeight){hero.style.transform=`translateY(${s*.25}px)`;hero.style.opacity=1-s/(window.innerHeight*.9)}
+});
 
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            if (mobileMenu.classList.contains('active')) {
-                menuIcon.classList.remove('fa-bars');
-                menuIcon.classList.add('fa-xmark');
-            } else {
-                menuIcon.classList.remove('fa-xmark');
-                menuIcon.classList.add('fa-bars');
-            }
-        });
+// Marquee loop (duplicate content)
+const track=document.getElementById('track');track.innerHTML+=track.innerHTML;
 
-        mobileMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                menuIcon.classList.remove('fa-xmark');
-                menuIcon.classList.add('fa-bars');
-            });
-        });
+// Game filters + search
+const filters=document.querySelectorAll('.filter'),search=document.getElementById('search'),cards=document.querySelectorAll('.game-card');
+function applyFilters(){
+  const f=document.querySelector('.filter.on').dataset.f,q=search.value.trim().toLowerCase();let n=0;
+  cards.forEach(c=>{
+    const ok=(f==='all'||c.dataset.c===f)&&c.textContent.toLowerCase().includes(q);
+    c.classList.toggle('hide',!ok);c.classList.add('active');if(ok)n++;
+  });
+  document.getElementById('empty').style.display=n?'none':'block';
+}
+filters.forEach(b=>b.addEventListener('click',()=>{filters.forEach(x=>x.classList.remove('on'));b.classList.add('on');applyFilters()}));
+search.addEventListener('input',applyFilters);
 
-        // 3. Custom Cursor Logic
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorOutline = document.getElementById('cursor-outline');
-        let mouseX = 0, mouseY = 0;
-        let outlineX = 0, outlineY = 0;
+// 3D tilt
+document.querySelectorAll('.tilt-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    const rx=((y-r.height/2)/(r.height/2))*-12,ry=((x-r.width/2)/(r.width/2))*12;
+    card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transition='transform .5s ease';card.style.transform='rotateX(0) rotateY(0) scale(1)'});
+  card.addEventListener('mouseenter',()=>{card.style.transition='transform .1s ease'});
+});
 
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Instantly move the dot
-            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
-        });
+// Newsletter
+document.getElementById('newsletterForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  document.getElementById('nl-msg').textContent="You're in! Watch your inbox for tournament invites and new game drops.";
+  e.target.reset();
+});
 
-        // Smooth lagging animation for the outline
-        function animateCursor() {
-            // Ease calculation (0.15 gives a nice smooth delay)
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            
-            cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px)`;
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+// Progress bar + back to top
+const bar=document.getElementById('progress'),top_=document.getElementById('totop');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  bar.style.width=(h>0?window.scrollY/h*100:0)+'%';
+  top_.classList.toggle('show',window.scrollY>700);
+});
+top_.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-        // Expand cursor on hoverable elements
-        const hoverables = document.querySelectorAll('a, button, input, .game-card, .feature-card');
-        hoverables.forEach(el => {
-            el.addEventListener('mouseenter', () => cursorOutline.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hover'));
-        });
+// Daily tournament countdown (to next local midnight)
+const pad=n=>String(n).padStart(2,'0');
+function tick(){
+  const now=new Date(),end=new Date(now);end.setHours(24,0,0,0);
+  const d=Math.max(0,end-now);
+  document.getElementById('cd-h').textContent=pad(Math.floor(d/36e5));
+  document.getElementById('cd-m').textContent=pad(Math.floor(d%36e5/6e4));
+  document.getElementById('cd-s').textContent=pad(Math.floor(d%6e4/1e3));
+}
+tick();setInterval(tick,1000);
 
-        // 4. Scroll Reveal Animation (Intersection Observer)
-        const revealElements = document.querySelectorAll('.reveal');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    revealObserver.unobserve(entry.target); // Stop observing once revealed
-                }
-            });
-        }, {
-            threshold: 0.15 // Trigger when 15% of the element is visible
-        });
+// Portal mouse parallax
+const portal=document.querySelector('.portal-wrap');
+window.addEventListener('mousemove',e=>{
+  const x=(e.clientX/window.innerWidth-.5)*20,y=(e.clientY/window.innerHeight-.5)*20;
+  portal.querySelectorAll('.chip').forEach((c,i)=>c.style.transform=`translate(${x*(i+1)*.6}px,${y*(i+1)*.6}px)`);
+});
 
-        revealElements.forEach(el => revealObserver.observe(el));
+// Image fallback so a broken image never leaves a blank card
+document.querySelectorAll('img').forEach(img=>img.addEventListener('error',()=>{
+  img.style.visibility='hidden';
+  if(img.parentElement)img.parentElement.style.background='linear-gradient(135deg,#101a08,#050507)';
+}));
 
-        // 5. Parallax Effect on Hero Text
-        const heroContent = document.getElementById('hero-content');
-        window.addEventListener('scroll', () => {
-            let scrollValue = window.scrollY;
-            if (scrollValue < window.innerHeight) {
-                heroContent.style.transform = `translateY(${scrollValue * 0.4}px)`;
-                heroContent.style.opacity = 1 - (scrollValue / (window.innerHeight * 0.8));
-            }
-        });
-
-        // 6. 3D Tilt Effect on Game Cards
-        const tiltCards = document.querySelectorAll('.tilt-card');
-        
-        tiltCards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; // x position within the element
-                const y = e.clientY - rect.top;  // y position within the element
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                // Calculate rotation (max 15 degrees)
-                const rotateX = ((y - centerY) / centerY) * -15;
-                const rotateY = ((x - centerX) / centerX) * 15;
-                
-                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                // Reset to flat when mouse leaves
-                card.style.transform = `rotateX(0) rotateY(0) scale(1)`;
-                card.style.transition = 'transform 0.5s ease'; // Smooth reset
-            });
-            
-            card.addEventListener('mouseenter', () => {
-                card.style.transition = 'transform 0.1s ease'; // Fast tracking when entering
-            });
-        });
-
-        // 7. Advanced Particle Network Canvas
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let particles = [];
-        const particleCount = 70;
-        let mouse = { x: null, y: null, radius: 150 };
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
-        });
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.offsetWidth;
-            canvas.height = canvas.parentElement.offsetHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 30) + 1;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-            }
-            update() {
-                // Move particles
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                // Bounce off edges
-                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
-                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
-
-                // Mouse interaction (push away)
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < mouse.radius) {
-                    let forceDirectionX = dx / distance;
-                    let forceDirectionY = dy / distance;
-                    let maxDistance = mouse.radius;
-                    let force = (maxDistance - distance) / maxDistance;
-                    let directionX = forceDirectionX * force * this.density;
-                    let directionY = forceDirectionY * force * this.density;
-                    
-                    this.x -= directionX;
-                    this.y -= directionY;
-                }
-            }
-            draw() {
-                ctx.fillStyle = `rgba(204, 255, 0, 0.5)`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function connectParticles() {
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a; b < particles.length; b++) {
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 120) {
-                        let opacityValue = 1 - (distance / 120);
-                        ctx.strokeStyle = `rgba(204, 255, 0, ${opacityValue * 0.2})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            connectParticles();
-            requestAnimationFrame(animateParticles);
-        }
-
-        initParticles();
-        animateParticles();
-    </script>
+// Particle network
+const canvas=document.getElementById('particle-canvas'),ctx=canvas.getContext('2d');
+let particles=[];const mouse={x:null,y:null,radius:150};
+window.addEventListener('mousemove',e=>{mouse.x=e.x;mouse.y=e.y});
+function resize(){canvas.width=canvas.parentElement.offsetWidth;canvas.height=canvas.parentElement.offsetHeight}
+resize();window.addEventListener('resize',resize);
+class P{
+  constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*2+1;this.d=Math.random()*30+1;this.sx=Math.random()-.5;this.sy=Math.random()-.5}
+  update(){
+    this.x+=this.sx;this.y+=this.sy;
+    if(this.x>canvas.width||this.x<0)this.sx*=-1;
+    if(this.y>canvas.height||this.y<0)this.sy*=-1;
+    const dx=mouse.x-this.x,dy=mouse.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<mouse.radius){const f=(mouse.radius-dist)/mouse.radius;this.x-=dx/dist*f*this.d;this.y-=dy/dist*f*this.d}
+  }
+  draw(){ctx.fillStyle='rgba(204,255,0,.5)';ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill()}
+}
+for(let i=0;i<70;i++)particles.push(new P());
+(function anim(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{p.update();p.draw()});
+  for(let a=0;a<particles.length;a++)for(let b=a;b<particles.length;b++){
+    const dx=particles[a].x-particles[b].x,dy=particles[a].y-particles[b].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<120){ctx.strokeStyle=`rgba(204,255,0,${(1-d/120)*.2})`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(particles[a].x,particles[a].y);ctx.lineTo(particles[b].x,particles[b].y);ctx.stroke()}
+  }
+  requestAnimationFrame(anim);
+})();
+</script>
 </body>
 </html>
